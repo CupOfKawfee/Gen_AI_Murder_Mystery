@@ -1,0 +1,11 @@
+openai>=1.0.0
+python-dotenv>=1.0.0
+
+# For RAG (example using Chroma)
+chromadb>=0.5.0
+
+# For vector embeddings (if you use sentence-transformers)
+sentence-transformers>=2.2.0
+
+# Optional utilities
+tqdm>=4.66.0
