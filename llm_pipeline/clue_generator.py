@@ -12,7 +12,7 @@ def generate_clues(
     Each clue should help solve the mystery when combined with the others.
     Clues MUST relate to:
     - the case_data (theme, victim, timeline)
-    - characters (secrets, relationships)
+    - characters (secrets, relationships, muderer_label)
     - last_day_data (events, suspicious moments)
     """
 
@@ -52,7 +52,7 @@ RULES FOR CLUES:
 1. A clue MUST point toward suspicious behavior, contradictions, evidence, or important insights.
 2. A clue MUST involve EXACT character names from the character list.
 3. The clues MUST be consistent with the victim's timeline from LAST_DAY_DATA.
-4. The clues MUST help solve the mystery when combined.
+4. The clues MUST help solve the mystery when combined and give hints about who is the killer. 
 5. Clues must avoid revealing the killer directly — they should provide partial, interconnected leads.
 6. Clues MUST be specific, not vague.
 7. A character must NEVER have a clue about themselves. The "target" must always be a DIFFERENT character name.

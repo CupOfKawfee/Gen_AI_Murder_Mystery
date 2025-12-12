@@ -1,4 +1,5 @@
 # llm_pipeline/character_generator.py
+import json
 from typing import Dict, List, Any
 from rag.retriever import RagRetriever
 from .llm_client import chat_json
@@ -8,6 +9,71 @@ def _format_rag_context(docs: List[Dict]) -> str:
     for d in docs:
         lines.append(f"[{d.get('id', 'doc')}] {d.get('text', '')}")
     return "\n".join(lines)
+
+
+def _parse_jsonish(raw_text: str):
+    """
+    Try to recover JSON arrays/objects from slightly messy model outputs.
+    Returns parsed JSON or None.
+    """
+    candidates = []
+    stripped = raw_text.strip().strip("`")
+    candidates.append(stripped)
+
+    # Heuristic: grab first JSON-looking segment
+    first_bracket_positions = [pos for pos in (stripped.find("["), stripped.find("{")) if pos != -1]
+    last_bracket_positions = [pos for pos in (stripped.rfind("]"), stripped.rfind("}")) if pos != -1]
+    if first_bracket_positions and last_bracket_positions:
+        start = min(first_bracket_positions)
+        end = max(last_bracket_positions)
+        if end > start:
+            candidates.append(stripped[start : end + 1])
+
+    for candidate in candidates:
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError:
+            continue
+    return None
+
+
+def _coerce_character_list(raw_result: Any) -> List[Dict[str, Any]] | None:
+    """
+    Normalize various possible model return shapes into a character list.
+    """
+    if isinstance(raw_result, list):
+        return raw_result
+
+    if isinstance(raw_result, str):
+        parsed = _parse_jsonish(raw_result)
+        if isinstance(parsed, list):
+            return parsed
+        if isinstance(parsed, dict):
+            for key in ("characters", "cast", "result"):
+                maybe_list = parsed.get(key)
+                if isinstance(maybe_list, list):
+                    return maybe_list
+
+    if isinstance(raw_result, dict):
+        # Common patterns: {"characters": [...]}, {"cast": [...]}, {"result": [...]}
+        for key in ("characters", "cast", "result"):
+            maybe_list = raw_result.get(key)
+            if isinstance(maybe_list, list):
+                return maybe_list
+
+        # If chat_json fell back to {"raw_text": "..."} try to parse that text.
+        raw_text = raw_result.get("raw_text")
+        if isinstance(raw_text, str):
+            parsed = _parse_jsonish(raw_text)
+            if isinstance(parsed, list):
+                return parsed
+            if isinstance(parsed, dict):
+                for key in ("characters", "cast", "result"):
+                    maybe_list = parsed.get(key)
+                    if isinstance(maybe_list, list):
+                        return maybe_list
+
+    return None
 
 
 def generate_characters(
@@ -58,12 +124,19 @@ For each character, include:
 - muderer_label: boolean indicating whether this character is the murderer
 
 Return a JSON array of character objects.
+
 """
 
-    result = chat_json(system_prompt, user_instruction)
+    raw_result = chat_json(system_prompt, user_instruction)
+    result = _coerce_character_list(raw_result)
 
     # If something goes wrong, wrap a single dummy character
     if not isinstance(result, list):
+        print("[WARN] Character generation returned non-list, using fallback. Raw output:")
+        try:
+            print(json.dumps(raw_result, indent=2))
+        except Exception:
+            print(raw_result)
         result = [
             {
                 "name": "Fallback Character",
@@ -79,7 +152,7 @@ Return a JSON array of character objects.
                 },
                 "source_references": [d.get("id", "doc") for d in rag_docs],
                 "muderer_label": False,
-                "raw_model_output": result,
+                "raw_model_output": raw_result,
             }
         ]
 
