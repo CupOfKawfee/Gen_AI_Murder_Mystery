@@ -31,12 +31,23 @@ def main():
         retriever=retriever
     )
 
+    # 5. Generate Images
+    print("\n=== GENERATING IMAGES ===")
+    for c in characters:
+        # We pass the whole character dict so the LLM can use background/occupation
+        img_path = generate_character_image(c)
+        if img_path:
+            c["image_path"] = img_path
+        else:
+            c["image_path"] = "generation_failed.png"
+
     print("\n=== CHARACTERS ===")
     for c in characters:
         print(f"- {c['name']}: {c['occupation']} ({c['relation_to_victim']})")
         print(f"  Secret: {c['secret']}")
         print(f"  Appearance: {c['appearance']}")
         print(f"  Muder [Y/N]: {c['muderer_label']}")
+        print(f"  Image Path: {c['image_path']}")
         print()
 
     # 6. Reconstruct the victim's last day
