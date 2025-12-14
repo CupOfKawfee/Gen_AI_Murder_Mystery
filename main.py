@@ -7,10 +7,39 @@ from llm_pipeline.clue_generator import generate_clues
 from llm_pipeline.solution_generator import generate_solution
 from rag.retriever import RagRetriever
 from image_tool.image_generator import generate_character_image
+from rag.recipes_retriever import load_all_recipes, get_menu_for_location  # NEW
+
 
 NUM_CHARACTERS = 7
 
+
 def main():
+    # 0. Ask for location of the murder mystery (NEW)
+    location = input(
+        "Where should the murder mystery take place? (e.g. Kiel, Hamburg, Lübeck) : "
+    ).strip()
+    if not location:
+        location = "Hamburg"
+
+    # 0b. Load recipes and build a menu for this location (NEW)
+    all_recipes = load_all_recipes()
+    menu = get_menu_for_location(location, all_recipes)
+
+    print("\n=== DINNER MENU FOR THIS MYSTERY ===")
+    if menu["starter"]:
+        print(f"Starter: {menu['starter'].name} ({menu['starter'].city})")
+    else:
+        print("Starter: none found")
+    if menu["main"]:
+        print(f"Main course: {menu['main'].name} ({menu['main'].city})")
+    else:
+        print("Main course: none found")
+    if menu["dessert"]:
+        print(f"Dessert: {menu['dessert'].name} ({menu['dessert'].city})")
+    else:
+        print("Dessert: none found")
+    print("====================================\n")
+
     # 1. Optional: user input for theme / setting
     user_prompt = input("Enter a desired setting or theme (or leave empty): ").strip()
     if not user_prompt:
@@ -19,8 +48,16 @@ def main():
     # 2. Initialize RAG retriever (stub for now)
     retriever = RagRetriever(index_path="data/index")  # adapt later
 
-    # 3. Generate the case (victim + theme)
-    case_data = generate_case(user_prompt=user_prompt)
+    # 3. Generate the case (victim + theme), now also using location + menu (CHANGED)
+    case_data = generate_case(
+        user_prompt=user_prompt,
+        location=location,
+        menu={
+            "starter": menu["starter"].name if menu["starter"] else None,
+            "main": menu["main"].name if menu["main"] else None,
+            "dessert": menu["dessert"].name if menu["dessert"] else None,
+        },
+    )
     print("\n=== CASE ===")
     print(case_data)
 
@@ -28,10 +65,10 @@ def main():
     characters = generate_characters(
         case_data=case_data,
         num_characters=NUM_CHARACTERS,
-        retriever=retriever
+        retriever=retriever,
     )
 
-    # 5. Generate Images
+    # 5. Generate Images (first image loop)
     print("\n=== GENERATING IMAGES ===")
     for c in characters:
         # We pass the whole character dict so the LLM can use background/occupation
@@ -61,11 +98,11 @@ def main():
         print(f"  Participants: {', '.join(event['participants'])}")
         print(f"  Suspicious: {event['suspicious']}")
 
-    # 7. generate clues
+    # 7. Generate clues
     clues = generate_clues(
         case_data=case_data,
         characters=characters,
-        last_day_data=last_day_data
+        last_day_data=last_day_data,
     )
 
     print("\n=== CHARACTER CLUES ===")
@@ -86,7 +123,7 @@ def main():
     killer_name = solution.get("killer_name")
     if killer_name:
         for c in characters:
-            c["murderer_label"] = (c["name"] == killer_name)
+            c["murderer_label"] = c["name"] == killer_name
 
     print("\n=== FINAL SOLUTION ===")
     print(f"Killer: {solution.get('killer_name')}")
@@ -112,24 +149,24 @@ def main():
 
     print("\n=== FINAL REVEAL MONOLOGUE ===")
     print(solution.get("final_reveal_monologue", ""))
-    
-          
-    # # 5. Generate one image per character (tool stub for now)
+
+    # # 9. Generate one image per character (second image loop; you might later deduplicate)
     # for c in characters:
     #     img_path_or_url = generate_character_image(
     #         name=c["name"],
-    #         appearance=c["appearance"]
+    #         appearance=c["appearance"],
     #     )
     #     c["image"] = img_path_or_url
 
-    # # 6. Generate dialogues (each character should talk at least once)
-    # dialogues = generate_dialogues(characters=characters, case_data=case_data)
+    # 10. Generate dialogues (each character should talk at least once)
+    dialogues = generate_dialogues(characters=characters, case_data=case_data)
 
-    # print("\n=== DIALOGUES ===")
-    # for i, scene in enumerate(dialogues, start=1):
-    #     print(f"\n--- Scene {i} ---")
-    #     for turn in scene["turns"]:
-    #         print(f"{turn['speaker']}: {turn['utterance']}")
+    print("\n=== DIALOGUES ===")
+    for i, scene in enumerate(dialogues, start=1):
+        print(f"\n--- Scene {i} ---")
+        for turn in scene["turns"]:
+            print(f"{turn['speaker']}: {turn['utterance']}")
+
 
 if __name__ == "__main__":
     main()
