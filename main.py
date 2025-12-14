@@ -150,15 +150,7 @@ def main():
     print("\n=== FINAL REVEAL MONOLOGUE ===")
     print(solution.get("final_reveal_monologue", ""))
 
-    # # 9. Generate one image per character (second image loop; you might later deduplicate)
-    # for c in characters:
-    #     img_path_or_url = generate_character_image(
-    #         name=c["name"],
-    #         appearance=c["appearance"],
-    #     )
-    #     c["image"] = img_path_or_url
-
-    # 10. Generate dialogues (each character should talk at least once)
+    # 9. Generate dialogues (each character should talk at least once)
     dialogues = generate_dialogues(characters=characters, case_data=case_data)
 
     print("\n=== DIALOGUES ===")
