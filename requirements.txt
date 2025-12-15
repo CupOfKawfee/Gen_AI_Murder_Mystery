@@ -9,3 +9,6 @@ sentence-transformers>=2.2.0
 
 # Optional utilities
 tqdm>=4.66.0
+
+#for app.py
+python -m pip install flask

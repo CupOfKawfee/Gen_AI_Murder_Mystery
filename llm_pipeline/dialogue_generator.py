@@ -2,6 +2,7 @@
 from typing import List, Dict, Any
 from .llm_client import chat_json
 
+
 def generate_dialogues(
     characters: List[Dict[str, Any]],
     case_data: Dict,
@@ -9,13 +10,14 @@ def generate_dialogues(
 ) -> List[Dict[str, Any]]:
     """
     Generates short conversations between the characters using LM Studio.
-    
+
     Output: list of scenes.
-    Each scene:
+    Each scene is a dict:
     {
       "description": "...",
       "turns": [
-         {"speaker": "Name", "role": "[1]" or "[2]", "utterance": "..."}
+        {"speaker": "Name", "role": "[1]" or "[2]", "utterance": "..."},
+        ...
       ]
     }
     """
@@ -37,6 +39,7 @@ def generate_dialogues(
             }
         )
 
+    # IMPORTANT: this is an f-string; all literal { } in the example JSON are escaped as {{ }}
     user_instruction = f"""
 You are given a murder-mystery case and the main characters.
 
@@ -48,36 +51,38 @@ CHARACTERS (summary):
 
 TASK:
 Create {num_scenes} short dialogue scenes between these characters.
+
 Rules:
 - The victim does NOT speak (they are dead or missing).
 - Each living character must speak at least once across all scenes.
-- Use [1] for the character who asks a direct question about another character's secret.
-- Use [2] for the character who answers that question about their own secret.
-- When [1] asks about a secret, they must briefly explain HOW they know or suspect that secret.
+- Use "[1]" for the character who asks a direct question about another character's secret.
+- Use "[2]" for the character who answers that question about their own secret.
+- When "[1]" asks about a secret, they must briefly explain HOW they know or suspect that secret.
 - The tone should feel tense and suspicious, but not too long-winded.
 
-Return a JSON array of scenes.
+Return a JSON array (list) of scenes.
 Each scene must be of the form:
+
 [
-  {
+  {{
     "description": "short description of where/when the scene takes place",
     "turns": [
-      {
+      {{
         "speaker": "Character Name",
         "role": "[1]" or "[2]",
         "utterance": "their line of dialogue"
-      },
+      }},
       ...
     ]
-  },
+  }},
   ...
 ]
 """
 
     result = chat_json(system_prompt, user_instruction)
 
-    if not isinstance(result, list):
-        # Minimal fallback dummy scene
+    # If the model didn't give a list, fall back to one simple scene
+    if not isinstance(result, list) or not result:
         result = [
             {
                 "description": "Fallback scene in a dimly lit room.",
@@ -85,12 +90,18 @@ Each scene must be of the form:
                     {
                         "speaker": characters[0]["name"],
                         "role": "[1]",
-                        "utterance": "I know you’re hiding something about the victim. I saw you near the harbor that night."
+                        "utterance": (
+                            "I know you’re hiding something about the victim. "
+                            "I saw you near the harbor that night."
+                        ),
                     },
                     {
                         "speaker": characters[1]["name"],
                         "role": "[2]",
-                        "utterance": "Fine, I was there. But I wasn’t the only one – and I’m not the killer."
+                        "utterance": (
+                            "Fine, I was there. But I wasn’t the only one – "
+                            "and I’m not the killer."
+                        ),
                     },
                 ],
                 "raw_model_output": result,

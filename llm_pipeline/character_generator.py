@@ -107,7 +107,7 @@ RAG_CONTEXT:
 {rag_text}
 
 TASK:
-Create a cast of exactly {num_characters} suspects or close contacts of the victim. One of them is the murderer.
+Create a cast of exactly {num_characters - 1} suspects or close contacts of the victim and 1 muderer.
 
 For each character, include:
 - name: string
