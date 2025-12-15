@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Murder Mystery</title>
+  </head>
+  <body>
+    <h1>Murder Mystery in {{ location }}</h1>
+
+    <h2>Dinner Menu</h2>
+    <ul>
+      <li>Starter: {{ menu.starter.name }} ({{ menu.starter.city }})</li>
+      <li>Main: {{ menu.main.name }} ({{ menu.main.city }})</li>
+      <li>Dessert: {{ menu.dessert.name }} ({{ menu.dessert.city }})</li>
+    </ul>
+
+    <h2>Case</h2>
+    <p><strong>Victim:</strong> {{ case.victim_name }} – {{ case.victim_description }}</p>
+    <p><strong>Theme:</strong> {{ case.controversial_theme }}</p>
+    <p><strong>Location:</strong> {{ case.location }}</p>
+    <p><strong>Summary:</strong> {{ case.summary }}</p>
+    <p><strong>Timeline:</strong> {{ case.timeline }}</p>
+
+    <h2>Characters</h2>
+    {% for c in characters %}
+      <div style="margin-bottom:1em;">
+        <h3>{{ c.name }}</h3>
+        <p><strong>Occupation:</strong> {{ c.occupation }} ({{ c.relation_to_victim }})</p>
+        <p><strong>Secret:</strong> {{ c.secret }}</p>
+        <p><strong>Appearance:</strong> {{ c.appearance }}</p>
+        <p><strong>Murderer label:</strong> {{ c.murderer_label }}</p>
+
+        {% if c.image_path %}
+          <img src="{{ c.image_path }}" alt="{{ c.name }}" style="max-width:200px;">
+        {% else %}
+          <p><strong>Image:</strong> No image available.</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <h2>Victim's Last Day</h2>
+    <p>{{ last_day.overview }}</p>
+    <ul>
+      {% for e in last_day.timeline %}
+        <li>
+          {{ e.time }} @ {{ e.location }} – {{ e.description }}
+          (Participants: {{ ", ".join(e.participants) }}, Suspicious: {{ e.suspicious }})
+        </li>
+      {% endfor %}
+    </ul>
+
+    <h2>Dialogues</h2>
+    {% for scene in dialogues %}
+      <h3>Scene</h3>
+      {% for turn in scene.turns %}
+        <p><strong>{{ turn.speaker }}:</strong> {{ turn.utterance }}</p>
+      {% endfor %}
+    {% endfor %}
+
+    <h2>Final Solution</h2>
+    <p><strong>Killer:</strong> {{ solution.killer_name }}</p>
+    <p><strong>Motive:</strong> {{ solution.motive }}</p>
+    <p><strong>Method:</strong> {{ solution.method }}</p>
+    <p><strong>Opportunity:</strong> {{ solution.opportunity }}</p>
+    <p><strong>Final monologue:</strong> {{ solution.final_reveal_monologue }}</p>
+  </body>
+</html>
