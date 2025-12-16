@@ -1,7 +1,6 @@
 # main.py
 from llm_pipeline.case_generator import generate_case
 from llm_pipeline.character_generator import generate_characters
-from llm_pipeline.dialogue_generator import generate_dialogues
 from llm_pipeline.last_day_victim import generate_last_day
 from llm_pipeline.clue_generator import generate_clues
 from llm_pipeline.solution_generator import generate_solution
@@ -68,23 +67,23 @@ def main():
         retriever=retriever,
     )
 
-    # 5. Generate Images (first image loop)
-    print("\n=== GENERATING IMAGES ===")
-    for c in characters:
-        # We pass the whole character dict so the LLM can use background/occupation
-        img_path = generate_character_image(c)
-        if img_path:
-            c["image_path"] = img_path
-        else:
-            c["image_path"] = "generation_failed.png"
+    # # 5. Generate Images (first image loop)
+    # print("\n=== GENERATING IMAGES ===")
+    # for c in characters:
+    #     # We pass the whole character dict so the LLM can use background/occupation
+    #     img_path = generate_character_image(c)
+    #     if img_path:
+    #         c["image_path"] = img_path
+    #     else:
+    #         c["image_path"] = "generation_failed.png"
 
     print("\n=== CHARACTERS ===")
     for c in characters:
         print(f"- {c['name']}: {c['occupation']} ({c['relation_to_victim']})")
         print(f"  Secret: {c['secret']}")
         print(f"  Appearance: {c['appearance']}")
-        print(f"  Muder [Y/N]: {c['muderer_label']}")
-        print(f"  Image Path: {c['image_path']}")
+        print(f"  Murder [Y/N]: {c['murderer_label']}")
+        #print(f"  Image Path: {c['image_path']}")
         print()
 
     # 6. Reconstruct the victim's last day
@@ -149,15 +148,6 @@ def main():
 
     print("\n=== FINAL REVEAL MONOLOGUE ===")
     print(solution.get("final_reveal_monologue", ""))
-
-    # 9. Generate dialogues (each character should talk at least once)
-    dialogues = generate_dialogues(characters=characters, case_data=case_data)
-
-    print("\n=== DIALOGUES ===")
-    for i, scene in enumerate(dialogues, start=1):
-        print(f"\n--- Scene {i} ---")
-        for turn in scene["turns"]:
-            print(f"{turn['speaker']}: {turn['utterance']}")
 
 
 if __name__ == "__main__":
