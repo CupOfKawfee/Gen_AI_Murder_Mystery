@@ -65,6 +65,9 @@ Optional Image Generation
 
 - Python 3.10+ (recommended)
 - An OpenAI-compatible endpoint (e.g. LM Studio)
+- Automatic 1111 with the ADetailer extension:
+  - For Image generation: RunDiffusion/Juggernaut-XL-v9 (https://huggingface.co/RunDiffusion/Juggernaut-XL-v9)
+  - The Lora model: SDXL-LoRA-slider.nice-hands (https://huggingface.co/ntc-ai/SDXL-LoRA-slider.nice-hands)
 - Optional: Flask for the web UI
 
 ---
