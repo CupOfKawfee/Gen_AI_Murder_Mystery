@@ -17,6 +17,7 @@ class Recipe:
 
 
 def _load_single_csv(path: pathlib.Path, course_type: str) -> List[Recipe]:
+    """Load a single CSV file into a list of Recipe objects."""
     # very forgiving encoding settings
     df = pd.read_csv(
         path,

@@ -19,6 +19,7 @@ REQUIRED_FIELDS = [
 ]
 
 def _format_rag_context(docs: List[Dict]) -> str:
+    """Format retrieved docs into a compact prompt block."""
     lines = []
     for d in docs:
         lines.append(f"[{d.get('id', 'doc')}] {d.get('text', '')}")
@@ -49,6 +50,7 @@ def _parse_jsonish(raw_text: str):
     return None
 
 def _coerce_character_list(raw_result: Any) -> Optional[List[Dict[str, Any]]]:
+    """Coerce model output into a character list if possible."""
     if isinstance(raw_result, list):
         return raw_result
 
@@ -82,6 +84,7 @@ def _coerce_character_list(raw_result: Any) -> Optional[List[Dict[str, Any]]]:
     return None
 
 def _normalize_character(c: Dict[str, Any], allowed_doc_ids: set) -> Dict[str, Any]:
+    """Normalize a character dict to the required schema and types."""
     # Backward compat for typo
     if "muderer_label" in c and "murderer_label" not in c:
         c["murderer_label"] = c.pop("muderer_label")
@@ -128,6 +131,7 @@ def _normalize_character(c: Dict[str, Any], allowed_doc_ids: set) -> Dict[str, A
     return cleaned
 
 def _enforce_exactly_one_murderer(characters: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Ensure exactly one character has murderer_label set to True."""
     true_idxs = [i for i, c in enumerate(characters) if c.get("murderer_label") is True]
     if len(true_idxs) == 1:
         return characters
@@ -146,6 +150,7 @@ def _enforce_exactly_one_murderer(characters: List[Dict[str, Any]]) -> List[Dict
     return characters
 
 def _enforce_unique_names(characters: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Ensure character names are unique by appending counters when needed."""
     seen = {}
     for c in characters:
         name = c.get("name", "Unnamed")
@@ -161,6 +166,7 @@ def generate_characters(
     num_characters: int,
     retriever: RagRetriever,
 ) -> List[Dict[str, Any]]:
+    """Generate, normalize, and validate a fixed-size character cast."""
     system_prompt = (
         "You are a writer of interactive murder mysteries. "
         "You MUST output ONLY valid JSON. No markdown, no commentary. "

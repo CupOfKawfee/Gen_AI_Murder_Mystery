@@ -13,6 +13,7 @@ NUM_CHARACTERS = 7
 
 
 def main():
+    """Run the CLI flow to generate a full murder-mystery scenario."""
     # 0. Ask for location of the murder mystery (NEW)
     location = input(
         "Where should the murder mystery take place? (e.g. Kiel, Hamburg, Lübeck) : "

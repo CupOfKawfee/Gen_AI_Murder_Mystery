@@ -18,6 +18,7 @@ NEGATIVE_PROMPT = (
 
 
 def _get_visual_prompt_from_llm(char: Dict) -> str:
+    """Build a concise visual prompt from a character description."""
     system_prompt = (
         "You are an expert AI art prompter for Stable Diffusion. "
         "Convert the character description into a concise list of visual keywords.\n"

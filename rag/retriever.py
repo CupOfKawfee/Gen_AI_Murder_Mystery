@@ -8,6 +8,7 @@ class RagRetriever:
     """
 
     def __init__(self, index_path: str):
+        """Store the index path for later retrieval setup."""
         self.index_path = index_path
         # TODO: load or build your index here
 

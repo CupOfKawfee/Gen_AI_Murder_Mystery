@@ -97,11 +97,13 @@ app = Flask(__name__)
 # serve files from image_tool/image_output
 @app.route("/character_images/<path:filename>")
 def character_images(filename):
+    """Serve generated character images from the output folder."""
     return send_from_directory("image_tool/image_output", filename)
 
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    """Render the landing page or generate a new mystery on POST."""
     if request.method == "POST":
         location = request.form.get("location") or "Hamburg"
         theme = (
