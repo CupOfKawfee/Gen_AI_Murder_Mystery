@@ -6,7 +6,7 @@ from llm_pipeline.clue_generator import generate_clues
 from llm_pipeline.solution_generator import generate_solution
 from rag.retriever import RagRetriever
 from image_tool.image_generator import generate_character_image
-from rag.recipes_retriever import load_all_recipes, get_menu_for_location  # NEW
+from rag.recipes_retriever import load_all_recipes, get_menu_for_location
 
 
 NUM_CHARACTERS = 7
