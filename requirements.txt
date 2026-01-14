@@ -9,6 +9,15 @@ sentence-transformers>=2.2.0
 
 # Optional utilities
 tqdm>=4.66.0
+fpdf2>=2.7.8
+
 
 #for app.py
 flask
+
+# For recipes retriever
+pandas>=1.3.0
+
+# For image generation
+requests>=2.31.0
+Pillow>=10.0.0

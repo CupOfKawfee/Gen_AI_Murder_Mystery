@@ -8,7 +8,7 @@ def generate_clues(
     last_day_data: Dict
 ) -> List[Dict[str, Any]]:
     """
-    Generate 1–2 meaningful clues per character.
+    Generate 1–2 meaningful clues per character (for all suspects AND the murderer).
     Each clue should help solve the mystery when combined with the others.
     Clues MUST relate to:
     - the case_data (theme, victim, timeline)
