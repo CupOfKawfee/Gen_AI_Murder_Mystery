@@ -1,35 +1,98 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Murder Mystery Generator</title>
-  </head>
-  <body>
-    <h1>Generate a Murder Mystery</h1>
-    <form method="post">
-      <label>Location:</label>
-      <input type="text" name="location" placeholder="Hamburg, Kiel, Lübeck"><br><br>
-
-      <label>Theme / setting:</label><br>
-      <textarea name="theme" rows="4" cols="60"
-        placeholder="A small coastal town with a controversial political scandal"></textarea><br><br>
-
-      <button type="submit">Generate mystery</button>
-    </form>
-  </body>
+    <head>
+        <title>Murder Mystery Generator</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 600px;
+                margin: 50px auto;
+                padding: 20px;
+                background-color: #f5f5f5;
+            }
+            h1 {
+                color: #333;
+                text-align: center;
+            }
+            form {
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            label {
+                display: block;
+                margin-top: 15px;
+                margin-bottom: 5px;
+                font-weight: bold;
+                color: #555;
+            }
+            input[type="text"], textarea {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-size: 14px;
+            }
+            textarea {
+                resize: vertical;
+                min-height: 80px;
+            }
+            button {
+                margin-top: 20px;
+                width: 100%;
+                padding: 12px;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                font-size: 16px;
+                cursor: pointer;
+            }
+            button:hover {
+                background-color: #45a049;
+            }
+            .section-title {
+                margin-top: 25px;
+                margin-bottom: 10px;
+                color: #333;
+                border-bottom: 2px solid #4CAF50;
+                padding-bottom: 5px;
+            }
+            .hint {
+                font-size: 12px;
+                color: #888;
+                font-style: italic;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Generate a Murder Mystery</h1>
+        <form method="post">
+            <label for="location">Location:</label>
+            <input type="text" name="location" id="location" placeholder="Hamburg, Kiel, Lübeck" value="Hamburg"><br>
+            
+            <label for="theme">Theme / setting:</label>
+            <textarea name="theme" id="theme" rows="4" cols="60"
+                placeholder="A small coastal town with a controversial political scandal"></textarea><br>
+            
+            <h3 class="section-title">Customize Your Dinner Menu</h3>
+            <p class="hint">Enter specific ingredients you want in each course (optional):</p>
+            
+            <label for="starter_ingredient">What kind of appetizers do you want?</label>
+            <input type="text" name="starter_ingredient" id="starter_ingredient" 
+                   placeholder="e.g., fish, salad, soup"><br>
+            
+            <label for="main_ingredient">What kind of main course do you want?</label>
+            <input type="text" name="main_ingredient" id="main_ingredient" 
+                   placeholder="e.g., beef, potatoes, chicken"><br>
+            
+            <label for="dessert_ingredient">What kind of dessert do you want?</label>
+            <input type="text" name="dessert_ingredient" id="dessert_ingredient" 
+                   placeholder="e.g., franzbroetchen, cake, pudding"><br>
+            
+            <button type="submit">Generate mystery</button>
+        </form>
+    </body>
 </html>
-
-<!--only for test 
-<!doctype html>
-<html>
-  <head>
-    <title>Murder Mystery Menu Test</title>
-  </head>
-  <body>
-    <h1>Test: Location-based Menu</h1>
-    <form method="post">
-      <label>Location:</label>
-      <input type="text" name="location" placeholder="Hamburg, Kiel, Lübeck"><br><br>
-      <button type="submit">Show menu</button>
-    </form>
-  </body>
-</html> -->

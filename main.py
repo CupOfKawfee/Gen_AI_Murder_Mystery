@@ -5,25 +5,61 @@ from llm_pipeline.last_day_victim import generate_last_day
 from llm_pipeline.clue_generator import generate_clues
 from llm_pipeline.solution_generator import generate_solution
 from rag.retriever import RagRetriever
-from image_tool.image_generator import generate_character_image
-from rag.recipes_retriever import load_all_recipes, get_menu_for_location
 
+# from image_tool.image_generator import generate_character_image
+from rag.recipes_retriever import (
+    load_all_recipes,
+    get_menu_for_location,
+    get_menu_by_ingredients,
+)
 
 NUM_CHARACTERS = 7
 
 
 def main():
-    """Run the CLI flow to generate a full murder-mystery scenario."""
-    # 0. Ask for location of the murder mystery (NEW)
+    # 0. Ask for location of the murder mystery
     location = input(
-        "Where should the murder mystery take place? (e.g. Kiel, Hamburg, Lübeck) : "
+        "Where should the murder mystery take place? (e.g. Kiel, Hamburg, Lübeck): "
     ).strip()
     if not location:
         location = "Hamburg"
 
-    # 0b. Load recipes and build a menu for this location (NEW)
+    # 0b. Load all recipes
     all_recipes = load_all_recipes()
-    menu = get_menu_for_location(location, all_recipes)
+
+    # NEW: Ask user for ingredient preferences
+    print("\n=== CUSTOMIZE YOUR DINNER MENU ===")
+    print("Enter ingredients you'd like in each course:")
+
+    starter_ingredient = input(
+        "What kind of appetizers do you want? (e.g., fish, salad, soup): "
+    ).strip()
+    main_ingredient = input(
+        "What kind of main course do you want? (e.g., beef, potatoes, chicken): "
+    ).strip()
+    dessert_ingredient = input(
+        "What kind of dessert do you want? (e.g., franzbroetchen, cake, pudding): "
+    ).strip()
+
+    # Get menu based on ingredients
+    if starter_ingredient or main_ingredient or dessert_ingredient:
+        print("\n=== SEARCHING FOR RECIPES WITH YOUR INGREDIENTS ===")
+        menu = get_menu_by_ingredients(
+            starter_ingredient if starter_ingredient else "",
+            main_ingredient if main_ingredient else "",
+            dessert_ingredient if dessert_ingredient else "",
+            all_recipes,
+        )
+
+        # Fallback to location-based if no matches found
+        if not menu["starter"] and not menu["main"] and not menu["dessert"]:
+            print(
+                f"No recipes found with those ingredients. Using {location}-based menu instead."
+            )
+            menu = get_menu_for_location(location, all_recipes)
+    else:
+        # Use location-based menu if no ingredients specified
+        menu = get_menu_for_location(location, all_recipes)
 
     print("\n=== DINNER MENU FOR THIS MYSTERY ===")
     if menu["starter"]:
@@ -48,7 +84,7 @@ def main():
     # 2. Initialize RAG retriever (stub for now)
     retriever = RagRetriever(index_path="data/index")  # adapt later
 
-    # 3. Generate the case (victim + theme), now also using location + menu (CHANGED)
+    # 3. Generate the case (victim + theme), now also using location + menu
     case_data = generate_case(
         user_prompt=user_prompt,
         location=location,
@@ -84,12 +120,11 @@ def main():
         print(f"  Secret: {c['secret']}")
         print(f"  Appearance: {c['appearance']}")
         print(f"  Murder [Y/N]: {c['murderer_label']}")
-        #print(f"  Image Path: {c['image_path']}")
+        # print(f"  Image Path: {c['image_path']}")
         print()
 
     # 6. Reconstruct the victim's last day
     last_day_data = generate_last_day(case_data=case_data, characters=characters)
-
     print("\n=== VICTIM'S LAST DAY ===")
     print("Overview:", last_day_data.get("overview", ""))
     print("Timeline:")
@@ -104,7 +139,6 @@ def main():
         characters=characters,
         last_day_data=last_day_data,
     )
-
     print("\n=== CHARACTER CLUES ===")
     for entry in clues:
         print(f"\n{entry['character']} has clues:")
@@ -129,23 +163,19 @@ def main():
     print(f"Killer: {solution.get('killer_name')}")
     print("\nMotive:")
     print(solution.get("motive", ""))
-
     print("\nMethod:")
     print(solution.get("method", ""))
-
     print("\nOpportunity:")
     print(solution.get("opportunity", ""))
-
     print("\nHow the clues fit together:")
     for align in solution.get("clue_alignment", []):
         print(
-            f" - {align['character']}'s clue about {align['about']} "
+            f"  - {align['character']}'s clue about {align['about']} "
             f"({align['clue_role']}): {align['explanation']}"
         )
-
     print("\nAlternative suspects:")
     for alt in solution.get("alternative_suspects", []):
-        print(f" - {alt['name']}: {alt['why_they_looked_suspicious']}")
+        print(f"  - {alt['name']}: {alt['why_they_looked_suspicious']}")
 
     print("\n=== FINAL REVEAL MONOLOGUE ===")
     print(solution.get("final_reveal_monologue", ""))
