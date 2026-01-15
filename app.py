@@ -1,12 +1,5 @@
 # app.py
-from flask import (
-    Flask,
-    render_template,
-    request,
-    send_from_directory,
-    session,
-    send_file,
-)
+from flask import Flask, render_template, request, send_from_directory
 from llm_pipeline.case_generator import generate_case
 from flask_session import Session
 from llm_pipeline.character_generator import generate_characters
@@ -20,8 +13,7 @@ from rag.recipes_retriever import (
     get_menu_by_ingredients,
     Recipe,
 )
-import secrets
-import os
+# from image_tool.image_generator import generate_character_image  # Commented out
 
 NUM_CHARACTERS = 7
 
@@ -104,9 +96,20 @@ def index():
         )
         print(f"Generated {len(characters)} characters")
 
-        # Set default image path
+        # Set default image path (since image generation is disabled)
         for c in characters:
             c["image_path"] = "/static/placeholder.png"
+
+        # Uncomment below if you want to enable image generation later
+        # import os
+        # from image_tool.image_generator import generate_character_image
+        # for c in characters:
+        #     img_file_path = generate_character_image(c)
+        #     if img_file_path:
+        #         filename = img_file_path.split(os.sep)[-1]
+        #         c["image_path"] = f"/character_images/{filename}"
+        #     else:
+        #         c["image_path"] = "/static/generation_failed.png"
 
         # Generate last day
         print("Generating victim's last day...")
@@ -251,4 +254,4 @@ def export_pdf():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

@@ -6,8 +6,8 @@ from typing import Dict
 from PIL import Image
 from llm_pipeline.llm_client import chat
 
-#Automatic1111 Stable Diffusion API URL
-SD_API_URL = "http://127.0.0.1:7860"
+# Automatic1111 Stable Diffusion API URL
+SD_API_URL = os.getenv("SD_API_URL", "http://127.0.0.1:7860")
 DEFAULT_OUTPUT_DIR = "image_tool/image_output"
 
 # The LoRA (Must match filename in models/Lora without extension) https://huggingface.co/ntc-ai/SDXL-LoRA-slider.nice-hands
