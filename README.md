@@ -68,8 +68,13 @@ Optional Image Generation
 - Automatic 1111 with the ADetailer extension:
   - For Image generation: RunDiffusion/Juggernaut-XL-v9 (https://huggingface.co/RunDiffusion/Juggernaut-XL-v9)
   - The Lora model: SDXL-LoRA-slider.nice-hands (https://huggingface.co/ntc-ai/SDXL-LoRA-slider.nice-hands)
-- Optional: Flask for the web UI
+- **Flask** for the web UI
+- **Flask-Session** for server-side session storage
+- **fpdf2** for PDF generation
+# Create session storage directory
+  mkdir flask_session
 
+- Note: The flask_session/ directory is required for server-side session storage. Session data is stored here instead of browser cookies to handle large mystery data (exceeds 4KB cookie limit).
 ---
 
 ## Installation
@@ -78,7 +83,11 @@ Optional Image Generation
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pip install flask  # only for the web UI
+pip install flask #for web UI
+Flask-Session==0.8.0 # stores session data
+fpdf2==2.8.5 # for pdf 
+cachelib
+
 ```
 
 ---
@@ -94,6 +103,17 @@ LM_STUDIO_MODEL=Your-Model-Name-Here
 ```
 
 ---
+
+***
+
+## Session Storage
+
+This application uses **Flask-Session** for server-side session storage. Mystery data (typically 7KB+) exceeds the browser cookie limit (4KB), so session data is stored in the `flask_session/` directory on disk.
+
+  **Setup:**
+  - The `flask_session/` directory is automatically created or you can create it manually:
+    ```bash
+    mkdir flask_session
 
 ## Usage (CLI)
 
