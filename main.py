@@ -5,6 +5,8 @@ from llm_pipeline.last_day_victim import generate_last_day
 from llm_pipeline.clue_generator import generate_clues
 from llm_pipeline.solution_generator import generate_solution
 from rag.retriever import RagRetriever
+from llm_pipeline.pdf_generator import generate_all_pdfs
+
 
 # from image_tool.image_generator import generate_character_image
 from rag.recipes_retriever import (
@@ -180,6 +182,18 @@ def main():
     print("\n=== FINAL REVEAL MONOLOGUE ===")
     print(solution.get("final_reveal_monologue", ""))
 
+    print("\n=== WRITING PDF OUTPUTS ===")
+    pdf_paths = generate_all_pdfs(
+        menu=menu,
+        case_data=case_data,
+        characters=characters,
+        last_day_data=last_day_data,
+        clues=clues,
+        solution=solution,
+    )
+    print("PDFs written:")
+    for path in pdf_paths:
+        print(f" - {path}")
 
 if __name__ == "__main__":
     main()
