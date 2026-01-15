@@ -1,98 +1,563 @@
 <!doctype html>
 <html>
-    <head>
-        <title>Murder Mystery Generator</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                max-width: 600px;
-                margin: 50px auto;
-                padding: 20px;
-                background-color: #f5f5f5;
-            }
-            h1 {
-                color: #333;
-                text-align: center;
-            }
-            form {
-                background: white;
-                padding: 30px;
-                border-radius: 8px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            }
-            label {
-                display: block;
-                margin-top: 15px;
-                margin-bottom: 5px;
-                font-weight: bold;
-                color: #555;
-            }
-            input[type="text"], textarea {
-                width: 100%;
-                padding: 10px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                box-sizing: border-box;
-                font-size: 14px;
-            }
-            textarea {
-                resize: vertical;
-                min-height: 80px;
-            }
-            button {
-                margin-top: 20px;
-                width: 100%;
-                padding: 12px;
-                background-color: #4CAF50;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                font-size: 16px;
-                cursor: pointer;
-            }
-            button:hover {
-                background-color: #45a049;
-            }
-            .section-title {
-                margin-top: 25px;
-                margin-bottom: 10px;
-                color: #333;
-                border-bottom: 2px solid #4CAF50;
-                padding-bottom: 5px;
-            }
-            .hint {
-                font-size: 12px;
-                color: #888;
-                font-style: italic;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>Generate a Murder Mystery</h1>
-        <form method="post">
+<head>
+    <title>Murder Mystery Generator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Special+Elite&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Special Elite', monospace;
+            min-height: 100vh;
+            background: #000000;
+            color: #d4d4d4;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 10%;
+            width: 3px;
+            height: 150px;
+            background: linear-gradient(to bottom, #8b0000, transparent);
+            opacity: 0.4;
+            z-index: 0;
+            animation: drip 3s ease-in-out infinite;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            right: 15%;
+            width: 2px;
+            height: 120px;
+            background: linear-gradient(to bottom, #8b0000, transparent);
+            opacity: 0.3;
+            z-index: 0;
+            animation: drip 4s ease-in-out infinite;
+        }
+        
+        @keyframes drip {
+            0%, 100% { height: 80px; opacity: 0.3; }
+            50% { height: 150px; opacity: 0.5; }
+        }
+        
+        .container::before {
+            content: '🔪';
+            position: fixed;
+            left: 5%;
+            top: 20%;
+            font-size: 4em;
+            opacity: 0.1;
+            transform: rotate(-25deg);
+            z-index: 0;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .container::after {
+            content: '☠️';
+            position: fixed;
+            right: 5%;
+            top: 60%;
+            font-size: 5em;
+            opacity: 0.08;
+            transform: rotate(15deg);
+            z-index: 0;
+            animation: float 7s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-25deg); }
+            50% { transform: translateY(-20px) rotate(-20deg); }
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        h1 {
+            font-family: 'Creepster', cursive;
+            color: #ff4444;
+            text-align: center;
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.8), 0 0 25px rgba(255,0,0,0.5);
+            letter-spacing: 3px;
+            position: relative;
+        }
+        
+        h1::before {
+            content: '🩸';
+            position: absolute;
+            left: -60px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-45deg);
+            font-size: 0.6em;
+            opacity: 0.3;
+            filter: drop-shadow(0 0 10px rgba(139,0,0,0.5));
+        }
+        
+        h1::after {
+            content: '🩸';
+            position: absolute;
+            right: -60px;
+            top: 50%;
+            transform: translateY(-50%) rotate(45deg) scaleX(-1);
+            font-size: 0.6em;
+            opacity: 0.3;
+            filter: drop-shadow(0 0 10px rgba(139,0,0,0.5));
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+        
+        form {
+            background: rgba(20, 20, 20, 0.95);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(139,0,0,0.3), inset 0 0 100px rgba(139,0,0,0.05);
+            border: 1px solid rgba(139,0,0,0.3);
+            position: relative;
+        }
+        
+        form::before {
+            content: '☠️';
+            position: absolute;
+            top: -30px;
+            left: -30px;
+            font-size: 2em;
+            opacity: 0.15;
+            filter: drop-shadow(0 0 10px rgba(255,0,0,0.3));
+        }
+        
+        form::after {
+            content: '🧨';
+            position: absolute;
+            bottom: -30px;
+            right: -30px;
+            font-size: 2em;
+            opacity: 0.15;
+            filter: drop-shadow(0 0 10px rgba(255,0,0,0.3));
+        }
+        
+        .section-title {
+            font-family: 'Creepster', cursive;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #ff6666;
+            font-size: 1.5em;
+            border-bottom: 2px solid rgba(139,0,0,0.5);
+            padding-bottom: 8px;
+            text-shadow: 0 0 10px rgba(255,0,0,0.3);
+        }
+        
+        .section-title:first-of-type {
+            margin-top: 0;
+        }
+        
+        label {
+            display: block;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #b8b8b8;
+            font-size: 0.95em;
+            letter-spacing: 0.5px;
+        }
+        
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(139,0,0,0.3);
+            border-radius: 6px;
+            background: rgba(10,0,0,0.6);
+            color: #d4d4d4;
+            font-family: 'Special Elite', monospace;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #ff4444;
+            background: rgba(20,0,0,0.8);
+            box-shadow: 0 0 15px rgba(255,0,0,0.3);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        button {
+            margin-top: 30px;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #8b0000 0%, #4d0000 100%);
+            color: white;
+            border: 2px solid rgba(139,0,0,0.5);
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Special Elite', monospace;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139,0,0,0.5);
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #a00000 0%, #6d0000 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,0,0,0.6);
+            border-color: #ff4444;
+        }
+
+        .hint {
+            font-size: 11px;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        ::placeholder {
+            color: #555;
+        }
+
+        /* Opening Animation */
+        .opening-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeOut 0.8s ease-out 2.5s forwards;
+        }
+        
+        @keyframes fadeOut {
+            to { opacity: 0; visibility: hidden; }
+        }
+        
+        .crime-scene-tape {
+            position: absolute;
+            width: 100%;
+            background: repeating-linear-gradient(45deg, #ffeb3b, #ffeb3b 40px, #000 40px, #000 80px);
+            padding: 10px;
+            font-family: 'Special Elite', monospace;
+            font-weight: bold;
+            font-size: 1.2em;
+            text-align: center;
+            letter-spacing: 5px;
+            color: #fff;  /* CHANGED: white text instead of black */
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .crime-scene-tape.bottom {
+            top: auto;
+            bottom: 0;
+            transform: rotate(180deg);
+        }
+        
+        .opening-content {
+            text-align: center;
+            position: relative;
+        }
+        
+        .blood-splatter {
+            font-size: 8em;
+            position: absolute;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            animation: splatter 0.5s ease-out 0.3s forwards;
+        }
+        
+        @keyframes splatter {
+            0% { opacity: 0; transform: translateX(-50%) scale(0.5); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.3); }
+            100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
+        }
+        
+        .opening-title {
+            font-family: 'Creepster', cursive;
+            font-size: 6em;
+            color: #ff0000;
+            text-shadow: 5px 5px 0px #000, 0 0 30px rgba(255,0,0,0.8);
+            margin: 10px 0;
+            letter-spacing: 10px;
+            opacity: 0;
+            transform: scale(0);
+        }
+        
+        .opening-title:first-of-type {
+            animation: screamIn 0.6s ease-out 0.5s forwards;
+        }
+        
+        .opening-title.mystery {
+            animation: screamIn 0.6s ease-out 0.9s forwards;
+        }
+        
+        @keyframes screamIn {
+            0% { opacity: 0; transform: scale(0) rotate(-10deg); }
+            60% { opacity: 1; transform: scale(1.2) rotate(5deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        
+        .knife-slash {
+            font-size: 5em;
+            position: absolute;
+            bottom: -100px;
+            right: -50px;
+            opacity: 0;
+            animation: slash 0.4s ease-out 1.4s forwards;
+        }
+        
+        @keyframes slash {
+            0% { opacity: 0; transform: translateX(-100px) rotate(-45deg); }
+            100% { opacity: 0.8; transform: translateX(0) rotate(0deg); }
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.98);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .loading-content {
+            text-align: center;
+            max-width: 600px;
+            padding: 40px;
+        }
+        
+        .detective-icon {
+            font-size: 8em;
+            animation: detectivePulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes detectivePulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(255,255,0,0.5)); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 30px rgba(255,255,0,0.8)); }
+        }
+        
+        .loading-title {
+            font-family: 'Creepster', cursive;
+            color: #ff4444;
+            font-size: 3em;
+            margin: 20px 0;
+            letter-spacing: 8px;
+            text-shadow: 0 0 20px rgba(255,0,0,0.8);
+        }
+        
+        .loading-text {
+            font-family: 'Special Elite', monospace;
+            color: #d4d4d4;
+            font-size: 1.2em;
+            margin: 30px 0;
+            animation: fadeInOut 3s ease-in-out infinite;
+        }
+        
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        .evidence-items {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .evidence-item {
+            font-size: 3em;
+            animation: evidenceBounce 1.5s ease-in-out infinite;
+        }
+        
+        .evidence-item:nth-child(1) { animation-delay: 0s; }
+        .evidence-item:nth-child(2) { animation-delay: 0.2s; }
+        .evidence-item:nth-child(3) { animation-delay: 0.4s; }
+        .evidence-item:nth-child(4) { animation-delay: 0.6s; }
+        .evidence-item:nth-child(5) { animation-delay: 0.8s; }
+        
+        @keyframes evidenceBounce {
+            0%, 100% { transform: translateY(0); }
+            25% { transform: translateY(-20px) rotate(-10deg); }
+            75% { transform: translateY(-10px) rotate(10deg); }
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height:8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 40px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b0000 0%, #ff0000 50%, #8b0000 100%);
+            background-size: 200% 100%;
+            animation: progressPulse 2s ease-in-out infinite;
+            width: 0%;
+        }
+        
+        @keyframes progressPulse {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Opening Animation -->
+    <div class="opening-overlay">
+        <div class="crime-scene-tape">CRIME SCENE - DO NOT CROSS</div>
+        <div class="opening-content">
+            <div class="blood-splatter">🩸</div>
+            <h1 class="opening-title">MURDER</h1>
+            <h1 class="opening-title mystery">MYSTERY</h1>
+            <div class="knife-slash">🔪</div>
+        </div>
+        <div class="crime-scene-tape bottom">CRIME SCENE - DO NOT CROSS</div>
+    </div>
+
+    <!-- Loading Animation -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="detective-icon">🕵️‍♂️</div>
+            <h2 class="loading-title">INVESTIGATING...</h2>
+            <div class="loading-text-container">
+                <p class="loading-text" id="loadingText">Analyzing the crime scene...</p>
+            </div>
+            <div class="evidence-items">
+                <div class="evidence-item">🔪</div>
+                <div class="evidence-item">🩸</div>
+                <div class="evidence-item">👀</div>
+                <div class="evidence-item">📄</div>
+                <div class="evidence-item">☠️</div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1>🔪 Murder Mystery 🔪</h1>
+        <p class="subtitle">Generate Your Own Deadly Dinner Party</p>
+        
+        <form method="post" id="mysteryForm">
+            <div class="section-title">📍 Crime Scene Details</div>
+            
             <label for="location">Location:</label>
-            <input type="text" name="location" id="location" placeholder="Hamburg, Kiel, Lübeck" value="Hamburg"><br>
+            <input type="text" name="location" id="location" 
+                   placeholder="Hamburg, Kiel, Lübeck..." >
+            <span class="hint">Where will the sinister events unfold?</span>
             
-            <label for="theme">Theme / setting:</label>
-            <textarea name="theme" id="theme" rows="4" cols="60"
-                placeholder="A small coastal town with a controversial political scandal"></textarea><br>
+            <label for="theme">Theme / Setting:</label>
+            <textarea name="theme" id="theme" rows="4" 
+                      placeholder="A small coastal town with a controversial political scandal..."></textarea>
+            <span class="hint">Set the dark atmosphere for your mystery</span>
             
-            <h3 class="section-title">Customize Your Dinner Menu</h3>
-            <p class="hint">Enter specific ingredients you want in each course (optional):</p>
+            <div class="section-title">🍽️ Deadly Dinner Menu</div>
+            <p class="hint" style="margin-bottom: 15px;">Customize your menu (optional) - each course tells part of the story...</p>
             
-            <label for="starter_ingredient">What kind of appetizers do you want?</label>
+            <label for="starter_ingredient">Appetizer Preference:</label>
             <input type="text" name="starter_ingredient" id="starter_ingredient" 
-                   placeholder="e.g., fish, salad, soup"><br>
+                   placeholder="e.g., fish, salad, soup">
             
-            <label for="main_ingredient">What kind of main course do you want?</label>
+            <label for="main_ingredient">Main Course Preference:</label>
             <input type="text" name="main_ingredient" id="main_ingredient" 
-                   placeholder="e.g., beef, potatoes, chicken"><br>
+                   placeholder="e.g., beef, potatoes, chicken">
             
-            <label for="dessert_ingredient">What kind of dessert do you want?</label>
+            <label for="dessert_ingredient">Dessert Preference:</label>
             <input type="text" name="dessert_ingredient" id="dessert_ingredient" 
-                   placeholder="e.g., franzbroetchen, cake, pudding"><br>
+                   placeholder="e.g., franzbroetchen, cake, pudding">
             
-            <button type="submit">Generate mystery</button>
+            <button type="submit">🕵️ Generate Mystery 🕵️</button>
         </form>
-    </body>
+    </div>
+
+    <script>
+        const loadingMessages = [
+            'Analyzing the crime scene...',
+            'Examining the evidence...',
+            'Interviewing witnesses...',
+            'Following the blood trail...',
+            'Uncovering secrets...',
+            'Connecting the clues...',
+            'Identifying suspects...',
+            'Determining the motive...',
+            'Building the case...',
+            'Solving the mystery...'
+        ];
+
+        let messageIndex = 0;
+        let loadingTextInterval;
+        let progressInterval;
+
+        function showLoadingAnimation() {
+            const overlay = document.getElementById('loading-overlay');
+            const loadingText = document.getElementById('loadingText');
+            const progressFill = document.querySelector('.progress-fill');
+            
+            overlay.style.display = 'flex';
+            messageIndex = 0;
+            
+            loadingTextInterval = setInterval(() => {
+                messageIndex = (messageIndex + 1) % loadingMessages.length;
+                loadingText.textContent = loadingMessages[messageIndex];
+            }, 2000);
+            
+            let progress = 0;
+            progressInterval = setInterval(() => {
+                progress += 0.5;
+                if (progress > 95) progress = 95;
+                progressFill.style.width = progress + '%';
+            }, 100);
+        }
+
+        const form = document.getElementById('mysteryForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                showLoadingAnimation();
+            });
+        }
+    </script>
+</body>
 </html>
+

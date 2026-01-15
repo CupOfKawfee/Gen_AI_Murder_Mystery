@@ -1,66 +1,555 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Murder Mystery</title>
-  </head>
-  <body>
-    <h1>Murder Mystery in {{ location }}</h1>
+<head>
+    <title>Murder Mystery - Case File</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Special+Elite&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Special Elite', monospace;
+            min-height: 100vh;
+            background: #000000;
+            color: #d4d4d4;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 10%;
+            width: 3px;
+            height: 150px;
+            background: linear-gradient(to bottom, #8b0000, transparent);
+            opacity: 0.4;
+            z-index: 0;
+            animation: drip 3s ease-in-out infinite;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            right: 15%;
+            width: 2px;
+            height: 120px;
+            background: linear-gradient(to bottom, #8b0000, transparent);
+            opacity: 0.3;
+            z-index: 0;
+            animation: drip 4s ease-in-out infinite;
+        }
+        
+        @keyframes drip {
+            0%, 100% { height: 80px; opacity: 0.3; }
+            50% { height: 150px; opacity: 0.5; }
+        }
+        
+        @keyframes revealPage {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            animation: revealPage 0.8s ease-out;
+        }
+        
+        .case-header {
+            background: rgba(20, 20, 20, 0.95);
+            border: 3px solid #8b0000;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(139,0,0,0.5), inset 0 0 100px rgba(139,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .case-header::before {
+            content: '⚠️';
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 2em;
+            opacity: 0.2;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .case-header::after {
+            content: '⚠️';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 2em;
+            opacity: 0.2;
+            animation: pulse 2s ease-in-out infinite;
+            animation-delay: 1s;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.1); }
+        }
+        
+        h1 {
+            font-family: 'Creepster', cursive;
+            color: #ff4444;
+            text-align: center;
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.8), 0 0 25px rgba(255,0,0,0.5);
+            letter-spacing: 3px;
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+        
+        @keyframes titleGlow {
+            0%, 100% { text-shadow: 3px 3px 6px rgba(0,0,0,0.8), 0 0 25px rgba(255,0,0,0.5); }
+            50% { text-shadow: 3px 3px 6px rgba(0,0,0,0.8), 0 0 35px rgba(255,0,0,0.8); }
+        }
+        
+        .case-number {
+            text-align: center;
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            font-style: italic;
+            letter-spacing: 2px;
+        }
+        
+        .crime-tape {
+            background: repeating-linear-gradient(45deg, #ffeb3b, #ffeb3b 40px, #000 40px, #000 80px);
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+            color: #fff;  /* CHANGED: white text */
+            letter-spacing: 3px;
+            margin: 20px -40px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.8);
+            animation: tapeShake 5s ease-in-out infinite;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(0,0,0,0.5);
+          }
 
-    <h2>Dinner Menu</h2>
-    <ul>
-      <li>Starter: {{ menu.starter.name }} ({{ menu.starter.city }})</li>
-      <li>Main: {{ menu.main.name }} ({{ menu.main.city }})</li>
-      <li>Dessert: {{ menu.dessert.name }} ({{ menu.dessert.city }})</li>
-    </ul>
+        
+        @keyframes tapeShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+        
+        .section {
+            background: rgba(20, 20, 20, 0.95);
+            border: 2px solid rgba(139,0,0,0.3);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(139,0,0,0.3);
+            position: relative;
+            animation: fadeIn 0.6s ease-out backwards;
+        }
+        
+        .section:nth-child(2) { animation-delay: 0.1s; }
+        .section:nth-child(3) { animation-delay: 0.2s; }
+        .section:nth-child(4) { animation-delay: 0.3s; }
+        .section:nth-child(5) { animation-delay: 0.4s; }
+        .section:nth-child(6) { animation-delay: 0.5s; }
+        .section:nth-child(7) { animation-delay: 0.6s; }
+        .section:nth-child(8) { animation-delay: 0.7s; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        h2 {
+            font-family: 'Creepster', cursive;
+            color: #ff6666;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(139,0,0,0.5);
+            padding-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255,0,0,0.3);
+        }
+        
+        h3 {
+            font-family: 'Creepster', cursive;
+            color: #ff8888;
+            font-size: 1.5em;
+            margin: 20px 0 15px;
+            text-shadow: 0 0 8px rgba(255,0,0,0.2);
+        }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .menu-item {
+            background: rgba(10,0,0,0.6);
+            border: 2px solid rgba(139,0,0,0.4);
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-item:hover {
+            border-color: #ff4444;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(255,0,0,0.4);
+        }
+        
+        .menu-item strong {
+            color: #ffeb3b;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+        
+        .location {
+            color: #888;
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        .case-detail {
+            margin: 15px 0;
+            padding: 12px;
+            background: rgba(10,0,0,0.4);
+            border-left: 3px solid #8b0000;
+            border-radius: 4px;
+        }
+        
+        .case-detail strong {
+            color: #ffeb3b;
+            display: inline-block;
+            min-width: 120px;
+        }
+        
+        .character-card {
+            background: rgba(10,0,0,0.6);
+            border: 2px solid rgba(139,0,0,0.4);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            position: relative;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .character-card:hover {
+            border-color: #ff4444;
+            box-shadow: 0 8px 25px rgba(255,0,0,0.4);
+            transform: scale(1.02);
+        }
+        
+        .character-card::before {
+            content: '👤';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 2em;
+            opacity: 0.1;
+        }
+        
+        .murderer-card {
+            border-color: #ff0000;
+            box-shadow: 0 0 30px rgba(255,0,0,0.6);
+            animation: murdererPulse 2s ease-in-out infinite;
+            padding-top: 45px;
+        }
+        
+        .murderer-card::after {
+            content: '☠️ MURDERER ☠️';
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #8b0000;
+            color: #fff;
+            padding: 5px 20px;
+            border-radius: 0 0 10px 10px;
+            font-family: 'Creepster', cursive;
+            font-size: 1.2em;
+            letter-spacing: 2px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.8);
+        }
+        
+        @keyframes murdererPulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(255,0,0,0.6); }
+            50% { box-shadow: 0 0 50px rgba(255,0,0,0.9); }
+        }
+        
+        .character-image {
+            max-width: 200px;
+            border-radius: 8px;
+            border: 3px solid rgba(139,0,0,0.5);
+            margin: 15px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            transition: all 0.3s ease;
+        }
+        
+        .character-image:hover {
+            transform: scale(1.05);
+            border-color: #ff4444;
+        }
+        
+        .character-info {
+            margin: 10px 0;
+            padding-left: 10px;
+        }
+        
+        .character-info strong {
+            color: #ff8888;
+        }
+        
+        .timeline-event {
+            position: relative;
+            padding: 15px 15px 15px 40px;
+            margin: 15px 0;
+            background: rgba(10,0,0,0.4);
+            border-left: 3px solid #8b0000;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .timeline-event::before {
+            content: '🔴';
+            position: absolute;
+            left: -12px;
+            top: 15px;
+            font-size: 1.5em;
+            animation: blinkDot 2s ease-in-out infinite;
+        }
+        
+        @keyframes blinkDot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .timeline-event.suspicious {
+            border-left-color: #ff0000;
+            background: rgba(139,0,0,0.2);
+        }
+        
+        .timeline-event.suspicious::before {
+            content: '⚠️';
+        }
+        
+        .timeline-time {
+            color: #ffeb3b;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-location {
+            color: #ff8888;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+        
+        .participants {
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .solution-section {
+            background: linear-gradient(135deg, rgba(139,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%);
+            border: 3px solid #ff0000;
+            box-shadow: 0 0 40px rgba(255,0,0,0.6);
+        }
+        
+        .solution-section h2 {
+            color: #ff0000;
+            text-shadow: 0 0 20px rgba(255,0,0,0.8);
+        }
+        
+        .final-reveal {
+            animation: revealSolution 1s ease-out;
+        }
+        
+        @keyframes revealSolution {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+                .confession-box {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 8px;
+            border: 2px solid #ff0000;
+        }
+        
+        .confession-box strong {
+            color: #ff4444;
+            font-size: 1.2em;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .confession-box p {
+            font-style: italic;
+            line-height: 1.6;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+        }
+        
+        .back-link p {
+            color: #888;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .back-link a {
+            color: #ff4444;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 12px 25px;
+            border: 2px solid #8b0000;
+            border-radius: 5px;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .back-link a:hover {
+            background: rgba(139,0,0,0.3);
+            border-color: #ff4444;
+            box-shadow: 0 0 20px rgba(255,0,0,0.5);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Case Header -->
+        <div class="case-header">
+            <div class="crime-tape">🚨 CLASSIFIED CASE FILE - CONFIDENTIAL 🚨</div>
+            <h1>🔪 Murder Mystery in {{ location }} 🔪</h1>
+            <div class="case-number">Case File - {{ location }}</div>
+        </div>
 
-    <h2>Case</h2>
-    <p><strong>Victim:</strong> {{ case.victim_name }} – {{ case.victim_description }}</p>
-    <p><strong>Theme:</strong> {{ case.controversial_theme }}</p>
-    <p><strong>Location:</strong> {{ case.location }}</p>
-    <p><strong>Summary:</strong> {{ case.summary }}</p>
-    <p><strong>Timeline:</strong> {{ case.timeline }}</p>
+        <!-- Dinner Menu -->
+        <div class="section">
+            <h2>🍽️ Last Supper Menu</h2>
+            <div class="menu-grid">
+                <div class="menu-item">
+                    <strong>🥗 Appetizer</strong>
+                    <div>{{ menu.starter.name }}</div>
+                    <div class="location">from {{ menu.starter.city }}</div>
+                </div>
+                <div class="menu-item">
+                    <strong>🥩 Main Course</strong>
+                    <div>{{ menu.main.name }}</div>
+                    <div class="location">from {{ menu.main.city }}</div>
+                </div>
+                <div class="menu-item">
+                    <strong>🍰 Dessert</strong>
+                    <div>{{ menu.dessert.name }}</div>
+                    <div class="location">from {{ menu.dessert.city }}</div>
+                </div>
+            </div>
+        </div>
 
-    <h2>Characters</h2>
-    {% for c in characters %}
-      <div style="margin-bottom:1em;">
-        <h3>{{ c.name }}</h3>
-        <p><strong>Occupation:</strong> {{ c.occupation }} ({{ c.relation_to_victim }})</p>
-        <p><strong>Secret:</strong> {{ c.secret }}</p>
-        <p><strong>Appearance:</strong> {{ c.appearance }}</p>
-        <p><strong>Murderer label:</strong> {{ c.murderer_label }}</p>
+        <!-- Case Details -->
+        <div class="section">
+            <h2>⚠️ Case Overview</h2>
+            <div class="case-detail">
+                <strong>Victim:</strong> {{ case.victim_name }} – {{ case.victim_description }}
+            </div>
+            <div class="case-detail">
+                <strong>Theme:</strong> {{ case.controversial_theme }}
+            </div>
+            <div class="case-detail">
+                <strong>Location:</strong> {{ case.location }}
+            </div>
+            <div class="case-detail">
+                <strong>Summary:</strong> {{ case.summary }}
+            </div>
+            <div class="case-detail">
+                <strong>Timeline:</strong> {{ case.timeline }}
+            </div>
+        </div>
 
-        {% if c.image_path %}
-          <img src="{{ c.image_path }}" alt="{{ c.name }}" style="max-width:200px;">
-        {% else %}
-          <p><strong>Image:</strong> No image available.</p>
-        {% endif %}
-      </div>
-    {% endfor %}
+        <!-- Characters -->
+        <div class="section">
+            <h2>🕵️ Suspects</h2>
+            {% for c in characters %}
+            <div class="character-card {% if c.murderer_label == 'murderer' %}murderer-card{% endif %}">
+                <h3>{{ c.name }}</h3>
+                <div class="character-info">
+                    <strong>Occupation:</strong> {{ c.occupation }} ({{ c.relation_to_victim }})
+                </div>
+                <div class="character-info">
+                    <strong>Secret:</strong> {{ c.secret }}
+                </div>
+                <div class="character-info">
+                    <strong>Appearance:</strong> {{ c.appearance }}
+                </div>
+                {% if c.image_path %}
+                <img src="{{ c.image_path }}" alt="{{ c.name }}" class="character-image">
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
 
-    <h2>Victim's Last Day</h2>
-    <p>{{ last_day.overview }}</p>
-    <ul>
-      {% for e in last_day.timeline %}
-        <li>
-          {{ e.time }} @ {{ e.location }} – {{ e.description }}
-          (Participants: {{ ", ".join(e.participants) }}, Suspicious: {{ e.suspicious }})
-        </li>
-      {% endfor %}
-    </ul>
+        <!-- Victim's Last Day -->
+        <div class="section">
+            <h2>⏰ Victim's Last Day</h2>
+            <p style="margin-bottom:20px;">{{ last_day.overview }}</p>
+            {% for e in last_day.timeline %}
+            <div class="timeline-event {% if e.suspicious %}suspicious{% endif %}">
+                <div class="timeline-time">{{ e.time }}</div>
+                <div class="timeline-location">@ {{ e.location }}</div>
+                <div>{{ e.description }}</div>
+                <div class="participants">Participants: {{ ", ".join(e.participants) }}</div>
+                {% if e.suspicious %}
+                <strong style="color:#ff4444; margin-top:8px; display:block;">⚠️ SUSPICIOUS ACTIVITY</strong>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
 
-    <h2>Dialogues</h2>
-    {% for scene in dialogues %}
-      <h3>Scene</h3>
-      {% for turn in scene.turns %}
-        <p><strong>{{ turn.speaker }}:</strong> {{ turn.utterance }}</p>
-      {% endfor %}
-    {% endfor %}
+        <!-- Final Solution -->
+        <div class="section solution-section">
+            <h2>🔍 FINAL SOLUTION</h2>
+            <div class="final-reveal">
+                <div class="case-detail">
+                    <strong>🎭 Killer:</strong> {{ solution.killer_name }}
+                </div>
+                <div class="case-detail">
+                    <strong>💀 Motive:</strong> {{ solution.motive }}
+                </div>
+                <div class="case-detail">
+                    <strong>🔪 Method:</strong> {{ solution.method }}
+                </div>
+                <div class="case-detail">
+                    <strong>⏱️ Opportunity:</strong> {{ solution.opportunity }}
+                </div>
+                <div class="confession-box">
+                    <strong>Final Confession:</strong>
+                    <p>{{ solution.final_reveal_monologue }}</p>
+                </div>
+            </div>
+        </div>
 
-    <h2>Final Solution</h2>
-    <p><strong>Killer:</strong> {{ solution.killer_name }}</p>
-    <p><strong>Motive:</strong> {{ solution.motive }}</p>
-    <p><strong>Method:</strong> {{ solution.method }}</p>
-    <p><strong>Opportunity:</strong> {{ solution.opportunity }}</p>
-    <p><strong>Final monologue:</strong> {{ solution.final_reveal_monologue }}</p>
-  </body>
+        <div class="back-link">
+            <p>☠️ CASE CLOSED ☠️</p>
+            <a href="/">← Generate New Mystery</a>
+        </div>
+    </div>
+</body>
 </html>
