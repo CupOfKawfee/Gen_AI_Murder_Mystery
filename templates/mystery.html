@@ -129,19 +129,53 @@
             padding: 8px;
             text-align: center;
             font-weight: bold;
-            color: #fff;  /* CHANGED: white text */
+            color: #fff;
             letter-spacing: 3px;
             margin: 20px -40px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.8);
             animation: tapeShake 5s ease-in-out infinite;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(0,0,0,0.5);
-          }
+        }
 
-        
         @keyframes tapeShake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-2px); }
             75% { transform: translateX(2px); }
+        }
+        
+        /* PDF Export Button Styles */
+        .export-section {
+            text-align: center;
+            margin: 25px 0 0 0;
+            padding: 20px 0;
+        }
+        
+        .export-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 16px 35px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.5);
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.1);
+            font-family: 'Special Elite', monospace;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.7);
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            border-color: rgba(255,255,255,0.3);
+        }
+        
+        .export-btn:active {
+            transform: translateY(-1px);
         }
         
         .section {
@@ -382,7 +416,7 @@
             to { opacity: 1; transform: scale(1); }
         }
         
-                .confession-box {
+        .confession-box {
             margin-top: 25px;
             padding: 20px;
             background: rgba(0,0,0,0.6);
@@ -440,6 +474,13 @@
             <div class="crime-tape">🚨 CLASSIFIED CASE FILE - CONFIDENTIAL 🚨</div>
             <h1>🔪 Murder Mystery in {{ location }} 🔪</h1>
             <div class="case-number">Case File - {{ location }}</div>
+        </div>
+
+        <!-- PDF Export Button -->
+        <div class="export-section">
+            <a href="/export_pdf" class="export-btn">
+                📄 Download Complete Case as PDF Package
+            </a>
         </div>
 
         <!-- Dinner Menu -->
@@ -553,3 +594,4 @@
     </div>
 </body>
 </html>
+
