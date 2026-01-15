@@ -1,23 +1,27 @@
+# Core dependencies
 openai>=1.0.0
 python-dotenv>=1.0.0
 
-# For RAG (example using Chroma)
-chromadb>=0.5.0
+# Web framework
+flask>=2.3.0
 
-# For vector embeddings (if you use sentence-transformers)
-sentence-transformers>=2.2.0
+# Session management
+Flask-Session==0.8.0
+cachelib>=0.10.0
 
-# Optional utilities
-tqdm>=4.66.0
-fpdf2>=2.7.8
+# PDF generation
+fpdf2==2.8.5
 
-
-#for app.py
-flask
-
-# For recipes retriever
+# Data processing
 pandas>=1.3.0
 
-# For image generation
+# RAG and embeddings
+chromadb>=0.5.0
+sentence-transformers>=2.2.0
+
+# Image generation
 requests>=2.31.0
 Pillow>=10.0.0
+
+# Utilities
+tqdm>=4.66.0
