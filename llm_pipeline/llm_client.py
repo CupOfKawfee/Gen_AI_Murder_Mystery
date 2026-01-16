@@ -98,3 +98,27 @@ def chat_json(
         _safe_print(raw)
         # Fallback: return as text so the app doesn't crash
         return {"raw_text": raw}
+
+def chat_with_tools(
+    messages: List[Dict[str, str]],
+    tools: List[Dict],
+    tool_choice: str = "auto",
+    temperature: float = 0.7,
+):
+    """
+    Capable of handling function calling. Returns the full message object
+    (which contains .tool_calls) instead of just the content string.
+    """
+    try:
+        response = client.chat.completions.create(
+            model=LM_STUDIO_MODEL,
+            messages=messages,
+            tools=tools,
+            tool_choice=tool_choice,
+            temperature=temperature,
+        )
+        # Return the actual message object so we can check for tool_calls
+        return response.choices[0].message
+    except BadRequestError as e:
+        _safe_print(f"[ERROR] LLM tool request failed: {e}")
+        return None

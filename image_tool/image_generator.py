@@ -1,91 +1,39 @@
 import os
+import json
 import requests
 import base64
 import io
-from typing import Dict
 from PIL import Image
-from llm_pipeline.llm_client import chat
 
-# Automatic1111 Stable Diffusion API URL
+# Import the updated client
+from llm_pipeline.llm_client import chat_with_tools
+
+# --- Configuration ---
 SD_API_URL = os.getenv("SD_API_URL", "http://127.0.0.1:7860")
 DEFAULT_OUTPUT_DIR = "image_tool/image_output"
+HAND_LORA_FILENAME = "SDXL-LoRA-slider.nice-hands"
 
-# The LoRA (Must match filename in models/Lora without extension) https://huggingface.co/ntc-ai/SDXL-LoRA-slider.nice-hands
-HAND_LORA_FILENAME = "SDXL-LoRA-slider.nice-hands" 
-
-# Resolution
-IMG_WIDTH = 512
-IMG_HEIGHT = 786
-
-# Style Prompts
-STYLE_PROMPT = "moody lighting, masterpiece, closeup, focus on face, sharp focus, 8k, detailed skin texture"
-NEGATIVE_PROMPT = "text, watermark, bad anatomy, blurry, cartoon, 3d render, disfigured, low quality, ugly, extra limbs, modern clothing"
-
-def _get_visual_prompt_from_llm(char: Dict) -> str:
+# --- 1. The "Inner" Function (The Tool Logic) ---
+def _raw_generate_image_api(prompt: str, negative_prompt: str, filename_prefix: str) -> str:
     """
-    Use LLM to convert character description into a concise visual prompt.
+    The actual worker function that hits the Automatic1111 API.
+    The LLM does NOT see the code inside here, only the inputs/outputs.
     """
-    system_prompt = (
-        "You are an expert AI art prompter for Stable Diffusion XL. "
-        "Convert the character description into a concise list of visual keywords.\n"
-        "1. Start with: 'Portrait of a [Age] year old [Gender] [Occupation]...'\n"
-        "2. Focus on lighting and textures (e.g. 'soft studio lighting', 'worn leather').\n"
-        "3. Output ONLY the raw prompt string. No markdown."
-    )
-    user_content = (
-        f"Name: {char.get('name')}\n"
-        f"Occupation: {char.get('occupation')}\n"
-        f"Appearance: {char.get('appearance')}\n"
-        f"Background: {char.get('background')}\n\n"
-        "Create the visual prompt:"
-    )
-    raw_response = chat(
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_content},
-        ],
-        temperature=0.7,
-    )
-    return raw_response.replace("Prompt:", "").replace('"', "").strip()
-
-
-def generate_character_image(
-    character: Dict, output_dir: str = DEFAULT_OUTPUT_DIR
-) -> str | None:
-    """
-    Generates an image for the given character using Stable Diffusion XL via Automatic1111 API.
-    1. Checks if an image already exists for the character in output_dir. If so, returns the path.
-    2. Uses LLM to create a visual prompt based on character details.
-    3. Configures ADetailer to enhance hand details in the generated image with an lora for good hands.
-    4. Sends a request to the Automatic1111 API to generate the image.
-    5. Saves and returns the path to the generated image, or None on failure.
-    """
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir, exist_ok=True)
-
-    safe_name = character["name"].replace(" ", "_")
-    filename = f"{safe_name}.png"
-    file_path = os.path.join(output_dir, filename)
-
-    if os.path.exists(file_path):
-        print(f"   Using existing image: {file_path}")
-        return file_path
-
-    # Generating Main Prompt
-    print(f"   Optimizing prompt for {character['name']}...")
-    visual_keywords = _get_visual_prompt_from_llm(character)
-    main_prompt = f"{visual_keywords}, {STYLE_PROMPT}"
-
-    # Configuring ADetailer for Hands
-    adetailer_prompt = f"detailed hands, nice hands, sharp focus, 8k, detailed skin texture, <lora:{HAND_LORA_FILENAME}:2.5>"
+    print(f"   [Tool Executing] Generating image for: '{filename_prefix}'...")
     
+    # Ensure directory exists
+    if not os.path.exists(DEFAULT_OUTPUT_DIR):
+        os.makedirs(DEFAULT_OUTPUT_DIR, exist_ok=True)
+
+    safe_name = filename_prefix.replace(" ", "_")
+    file_path = os.path.join(DEFAULT_OUTPUT_DIR, f"{safe_name}.png")
+
+    # ADetailer Configuration (Hardcoded logic usually stays here)
     adetailer_args = [
-        True,   # 1. Enable ADetailer
-        False,  # 2. Do not skip img2img
-        { 
-            "ad_model": "hand_yolov8n.pt",   
-            "ad_prompt": adetailer_prompt,
-            "ad_negative_prompt": "mutated, extra fingers, missing fingers, disfigured, low quality, ugly, extra limbs",
+        True, False,
+        {
+            "ad_model": "hand_yolov8n.pt",
+            "ad_prompt": f"detailed hands, <lora:{HAND_LORA_FILENAME}:2.5>",
             "ad_confidence": 0.3,
             "ad_mask_blur": 35,
             "ad_denoising_strength": 0.4,
@@ -93,35 +41,125 @@ def generate_character_image(
     ]
 
     payload = {
-        "prompt": main_prompt,
-        "negative_prompt": NEGATIVE_PROMPT,
+        "prompt": prompt,
+        "negative_prompt": negative_prompt,
         "steps": 25,
-        "cfg_scale": 7,
-        "width": IMG_WIDTH,
-        "height": IMG_HEIGHT,
+        "width": 512, 
+        "height": 768,
         "sampler_name": "DPM++ 2M Karras",
-        "restore_faces": False,
-        "alwayson_scripts": {
-            "ADetailer": {
-                "args": adetailer_args
-            }
-        }
+        "alwayson_scripts": {"ADetailer": {"args": adetailer_args}}
     }
 
-    print(f"   Sending to Automatic1111...")
-    
     try:
         response = requests.post(url=f"{SD_API_URL}/sdapi/v1/txt2img", json=payload)
         if response.status_code == 200:
             r = response.json()
             image = Image.open(io.BytesIO(base64.b64decode(r["images"][0])))
             image.save(file_path)
-            print(f"   Saved: {file_path}")
+            print(f"   [Tool Success] Saved to {file_path}")
             return file_path
         else:
-            print(f"   API Error {response.status_code}: {response.text}")
-            return None
+            return f"Error: API Status {response.status_code}"
+    except Exception as e:
+        return f"Error: {str(e)}"
 
-    except requests.exceptions.ConnectionError:
-        print("   Error: Automatic1111 API not reachable.")
-        return None
+# --- 2. The Tool Definition (Schema) ---
+# This describes the function above to the LLM
+IMAGE_TOOL_DEF = {
+    "type": "function",
+    "function": {
+        "name": "generate_image_via_api",
+        "description": "Generates an image using Stable Diffusion. Use this whenever the user wants to visualize a character or scene.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "prompt": {
+                    "type": "string",
+                    "description": "The highly detailed visual prompt. Include lighting, style (e.g. 'masterpiece, 8k, moody lighting'), and subject details."
+                },
+                "negative_prompt": {
+                    "type": "string",
+                    "description": "What to avoid (e.g. 'ugly, blurry, bad anatomy')."
+                },
+                "filename_prefix": {
+                    "type": "string",
+                    "description": "A short, safe filename for the image based on the character name."
+                }
+            },
+            "required": ["prompt", "negative_prompt", "filename_prefix"]
+        }
+    }
+}
+
+# --- 3. The "Outer" Function (The Agent Interface) ---
+def generate_character_image(character_data: dict) -> str:
+    """
+    The main entry point. It constructs the context and lets the LLM decide 
+    how to call the image generation tool.
+    """
+    
+    # 1. Setup the Agent's Persona
+    system_prompt = (
+        "You are an expert AI Art Director. Your goal is to generate the perfect prompt "
+        "for a Stable Diffusion model based on the character description provided.\n"
+        "1. Analyze the character details.\n"
+        "2. Construct a 'masterpiece' style prompt with lighting and texture keywords.\n"
+        "3. CALL the 'generate_image_via_api' tool with your constructed prompt.\n"
+        "4. Do NOT output markdown text, just call the tool."
+    )
+
+    user_content = (
+        f"Create an image for this character:\n"
+        f"Name: {character_data.get('name')}\n"
+        f"Role: {character_data.get('occupation')}\n"
+        f"Appearance: {character_data.get('appearance')}\n"
+        f"Background: {character_data.get('background')}"
+    )
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_content}
+    ]
+
+    print(f"--- Agent thinking about {character_data.get('name')} ---")
+
+    # 2. Call the LLM with the Tool Definition
+    response_message = chat_with_tools(
+        messages=messages,
+        tools=[IMAGE_TOOL_DEF],
+        tool_choice="auto" # Let LLM decide whether to generate text or call the tool
+    )
+
+    # 3. Handle the Tool Call
+    if response_message and response_message.tool_calls:
+        # The LLM wants to execute a tool
+        for tool_call in response_message.tool_calls:
+            if tool_call.function.name == "generate_image_via_api":
+                
+                # Parse arguments generated by the LLM
+                args = json.loads(tool_call.function.arguments)
+                
+                print(f"   [Agent Decision] Calling API with prompt: {args['prompt'][:50]}...")
+                
+                # Execute the Inner Function
+                result_path = _raw_generate_image_api(
+                    prompt=args["prompt"],
+                    negative_prompt=args.get("negative_prompt", "ugly, blurry"),
+                    filename_prefix=args["filename_prefix"]
+                )
+                
+                return result_path
+    
+    # Fallback if LLM refused to call tool
+    return "Error: Agent did not trigger image generation."
+
+# --- Usage Example ---
+if __name__ == "__main__":
+    char = {
+        "name": "Kael",
+        "occupation": "Space Marine",
+        "appearance": "weary face, scar on cheek, heavy futuristic armor, rain dripping",
+        "background": "cyberpunk alleyway neon lights"
+    }
+    path = generate_character_image(char)
+    print(f"Final Result: {path}")
