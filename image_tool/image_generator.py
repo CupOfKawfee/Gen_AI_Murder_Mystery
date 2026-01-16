@@ -77,7 +77,7 @@ def generate_character_image(
     main_prompt = f"{visual_keywords}, {STYLE_PROMPT}"
 
     # Configuring ADetailer for Hands
-    adetailer_prompt = f"detailed hands, nice hands, <lora:{HAND_LORA_FILENAME}:1.0>"
+    adetailer_prompt = f"detailed hands, nice hands, sharp focus, 8k, detailed skin texture, <lora:{HAND_LORA_FILENAME}:2.5>"
     
     adetailer_args = [
         True,   # 1. Enable ADetailer
@@ -85,10 +85,10 @@ def generate_character_image(
         { 
             "ad_model": "hand_yolov8n.pt",   
             "ad_prompt": adetailer_prompt,
-            "ad_negative_prompt": "mutated, extra fingers, missing fingers",
+            "ad_negative_prompt": "mutated, extra fingers, missing fingers, disfigured, low quality, ugly, extra limbs",
             "ad_confidence": 0.3,
-            "ad_mask_blur": 4,
-            "ad_denoising_strength": 0.35, 
+            "ad_mask_blur": 35,
+            "ad_denoising_strength": 0.4,
         }
     ]
 
