@@ -1,5 +1,8 @@
 # rag/retriever.py
+import json
+from pathlib import Path
 from typing import List, Dict
+
 
 class RagRetriever:
     """
@@ -10,7 +13,13 @@ class RagRetriever:
     def __init__(self, index_path: str):
         """Store the index path for later retrieval setup."""
         self.index_path = index_path
-        # TODO: load or build your index here
+        path = Path(index_path)
+        index_file = path / "index.json" if path.is_dir() else path
+        if index_file.is_file():
+            with index_file.open("r", encoding="utf-8") as f:
+                self.index = json.load(f)
+        else:
+            self.index = []
 
     def retrieve(self, query: str, k: int = 3) -> List[Dict]:
         """

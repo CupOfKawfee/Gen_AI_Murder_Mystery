@@ -1,4 +1,3 @@
-# rag/recipes_retriever.py
 from dataclasses import dataclass
 from typing import List, Optional, Dict
 import pandas as pd

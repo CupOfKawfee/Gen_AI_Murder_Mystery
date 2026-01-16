@@ -21,7 +21,7 @@ def generate_case(user_prompt: str, location: str, menu: Dict) -> Dict:
     user_instruction = f"""
 Create a murder-mystery setup inspired by this user setting or theme:
 
-\"\"\"{user_prompt}\"\"\".
+"{user_prompt}".
 
 The mystery takes place in the following location:
 - location_of_event: "{location}"

@@ -4,9 +4,10 @@ from llm_pipeline.character_generator import generate_characters
 from llm_pipeline.last_day_victim import generate_last_day
 from llm_pipeline.clue_generator import generate_clues
 from llm_pipeline.solution_generator import generate_solution
-from rag.retriever import RagRetriever
 from llm_pipeline.pdf_generator import generate_all_pdfs
-from evaluation import SimpleEvaluator  # NEW: Import evaluator
+from evaluation import SimpleEvaluator
+from rag.retriever import RagRetriever
+
 
 # from image_tool.image_generator import generate_character_image
 from rag.recipes_retriever import (
@@ -182,7 +183,7 @@ def main():
     print("\n=== FINAL REVEAL MONOLOGUE ===")
     print(solution.get("final_reveal_monologue", ""))
 
-    # NEW: Run evaluation metrics
+    # 9. Run evaluation metrics
     print("\n" + "=" * 70)
     print("🎯 RUNNING QUALITY EVALUATION")
     print("=" * 70)

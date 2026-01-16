@@ -8,9 +8,20 @@ from openai import OpenAI, BadRequestError
 
 load_dotenv()
 
-LM_STUDIO_BASE_URL = os.getenv("LM_STUDIO_BASE_URL", "http://localhost:1234/v1")
-LM_STUDIO_MODEL = os.getenv("LM_STUDIO_MODEL", "qwen/qwen3-vl-4b")
-LM_STUDIO_API_KEY = os.getenv("LM_STUDIO_API_KEY", "lm-studio")  # dummy but required
+
+def _getenv_stripped(name: str, default: str) -> str:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip()
+
+LM_STUDIO_BASE_URL = _getenv_stripped(
+    "LM_STUDIO_BASE_URL", "http://localhost:1234/v1"
+)
+LM_STUDIO_MODEL = _getenv_stripped("LM_STUDIO_MODEL", "qwen/qwen3-vl-4b")
+LM_STUDIO_API_KEY = _getenv_stripped(
+    "LM_STUDIO_API_KEY", "lm-studio"
+)  # dummy but required
 
 client = OpenAI(
     base_url=LM_STUDIO_BASE_URL,

@@ -1,24 +1,34 @@
 # app.py
-from flask import Flask, render_template, request, send_from_directory
-from llm_pipeline.case_generator import generate_case
+from flask import Flask, render_template, request, send_file, send_from_directory, session
 from flask_session import Session
+from llm_pipeline.case_generator import generate_case
 from llm_pipeline.character_generator import generate_characters
 from llm_pipeline.last_day_victim import generate_last_day
 from llm_pipeline.clue_generator import generate_clues
 from llm_pipeline.solution_generator import generate_solution
-from rag.retriever import RagRetriever
 from rag.recipes_retriever import (
     load_all_recipes,
     get_menu_for_location,
     get_menu_by_ingredients,
     Recipe,
 )
+import secrets
+import os
+import zipfile
+from datetime import datetime
+from rag.retriever import RagRetriever
+
+
+
+
 # from image_tool.image_generator import generate_character_image  # Commented out
 
 NUM_CHARACTERS = 7
 
 app = Flask(__name__)
-app.secret_key = secrets.token_hex(16)
+#app.secret_key = secrets.token_hex(16)
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-only-change-me")
+
 
 # Configure Flask-Session for server-side storage
 app.config["SESSION_TYPE"] = "filesystem"
@@ -28,6 +38,7 @@ app.config["SESSION_USE_SIGNER"] = True
 
 # Initialize Flask-Session
 Session(app)
+#os.makedirs(app.config["SESSION_FILE_DIR"], exist_ok=True)
 
 print(" Flask-Session initialized with filesystem storage")
 
