@@ -1,0 +1,16 @@
+{
+  "scores": {
+    "character_consistency": 10.0,
+    "timeline_completeness": 10.0,
+    "clue_quantity": 7.0,
+    "rag_integration": 0.0,
+    "narrative_quality": 7.0
+  },
+  "details": {
+    "characters_mentioned": "7/7",
+    "timeline_events": 5,
+    "total_clues": 7,
+    "menu_items_used": "0/3"
+  },
+  "overall_score": 6.8
+}

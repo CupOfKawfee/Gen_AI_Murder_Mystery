@@ -6,6 +6,6 @@ services:
     ports:
       - "5000:5000"
     env_file:
-      - .env
+      - .env.docker
     volumes:
       - ./image_tool/image_output:/app/image_tool/image_output

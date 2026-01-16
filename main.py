@@ -6,7 +6,7 @@ from llm_pipeline.clue_generator import generate_clues
 from llm_pipeline.solution_generator import generate_solution
 from rag.retriever import RagRetriever
 from llm_pipeline.pdf_generator import generate_all_pdfs
-from evaluation import SimpleEvaluator  # NEW: Import evaluator
+from evaluation import SimpleEvaluator
 
 # from image_tool.image_generator import generate_character_image
 from rag.recipes_retriever import (
