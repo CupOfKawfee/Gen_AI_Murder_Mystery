@@ -1,16 +1,16 @@
 {
   "scores": {
-    "character_consistency": 5.7,
+    "character_consistency": 7.1,
     "timeline_completeness": 10.0,
-    "clue_quantity": 7.0,
-    "rag_integration": 10.0,
-    "narrative_quality": 7.0
+    "clue_quantity": 6.0,
+    "rag_integration": 0.0,
+    "narrative_quality": 8.0
   },
   "details": {
-    "characters_mentioned": "4/7",
+    "characters_mentioned": "5/7",
     "timeline_events": 5,
-    "total_clues": 7,
-    "menu_items_used": "3/3"
+    "total_clues": 6,
+    "menu_items_used": "0/3"
   },
-  "overall_score": 7.9
+  "overall_score": 6.2
 }
