@@ -30,7 +30,7 @@ Out of scope are real-time web search, model fine-tuning, and persistent vector 
 We recommend using Docker to build the application by running:
 - open Docker Client
 - ```docker build -t gen-ai-murder-mystery ```
-- ```docker run -p 5001:5000 –env-file .env gen-ai-murder-mystery```
+- ```docker run -p 5001:5000 –env-file .env.docker gen-ai-murder-mystery```
 - have Automatic 1111 up and running with the models mentioned in requirements.
 - then, run on: http://localhost:5001/
 Make sure you have LMStudio running with the model ”qwen/qwen3-vl-4b”, which we always
