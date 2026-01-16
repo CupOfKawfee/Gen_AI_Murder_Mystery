@@ -578,29 +578,6 @@
                 </div>
             </div>
         </div>
-        <!-- Evaluation Scores Section -->
-        <div class="section" style="background: linear-gradient(135deg, rgba(102,126,234,0.2) 0%, rgba(0,0,0,0.8) 100%); border-color: #667eea;">
-            <h2 style="color: #667eea;">📊 Quality Evaluation Scores</h2>
-            
-            {% for metric, score in evaluation.scores.items() %}
-            <div style="margin: 15px 0;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                    <span style="color: #d4d4d4; font-weight: bold;">
-                        {{ metric.replace('_', ' ').title() }}
-                    </span>
-                    <span style="color: #ffeb3b; font-weight: bold;">{{ score }}/10</span>
-                </div>
-                <div style="background: rgba(0,0,0,0.5); border-radius: 10px; height: 20px; overflow: hidden;">
-                    <div style="background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; width: {{ score * 10 }}%; transition: width 0.5s ease;"></div>
-                </div>
-            </div>
-            {% endfor %}
-            
-            <div style="margin-top: 25px; padding: 15px; background: rgba(102,126,234,0.1); border: 2px solid #667eea; border-radius: 8px; text-align: center;">
-                <span style="color: #667eea; font-size: 1.2em; font-weight: bold;">Overall Score: </span>
-                <span style="color: #ffeb3b; font-size: 1.5em; font-weight: bold;">{{ evaluation.overall_score }}/10</span>
-            </div>
-        </div>
         <!-- PDF Export Button -->
         <div class="export-section">
             <a href="/export_pdf" class="export-btn">

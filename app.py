@@ -1,20 +1,11 @@
 # app.py
-from flask import (
-    Flask,
-    render_template,
-    request,
-    send_from_directory,
-    session,
-    send_file,
-)
-from llm_pipeline.case_generator import generate_case
+from flask import Flask, render_template, request, send_file, send_from_directory, session
 from flask_session import Session
+from llm_pipeline.case_generator import generate_case
 from llm_pipeline.character_generator import generate_characters
 from llm_pipeline.last_day_victim import generate_last_day
 from llm_pipeline.clue_generator import generate_clues
 from llm_pipeline.solution_generator import generate_solution
-from evaluation import SimpleEvaluator
-from rag.retriever import RagRetriever
 from rag.recipes_retriever import (
     load_all_recipes,
     get_menu_for_location,
@@ -23,19 +14,24 @@ from rag.recipes_retriever import (
 )
 import secrets
 import os
-<<<<<<< HEAD
 import zipfile
 from datetime import datetime
 from rag.retriever import RagRetriever
+from dotenv import load_dotenv
 from image_tool.image_generator import generate_character_image
 
-=======
->>>>>>> 3f0a4a2 ( Update app.py with evaluation metrics and UI wiring)
+# Load .env when running via `python app.py`
+load_dotenv()
+
+
+# from image_tool.image_generator import generate_character_image  # Commented out
 
 NUM_CHARACTERS = 7
 
 app = Flask(__name__)
-app.secret_key = secrets.token_hex(16)
+#app.secret_key = secrets.token_hex(16)
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-only-change-me")
+
 
 # Configure Flask-Session for server-side storage
 app.config["SESSION_TYPE"] = "filesystem"
@@ -45,6 +41,7 @@ app.config["SESSION_USE_SIGNER"] = True
 
 # Initialize Flask-Session
 Session(app)
+#os.makedirs(app.config["SESSION_FILE_DIR"], exist_ok=True)
 
 print(" Flask-Session initialized with filesystem storage")
 
@@ -113,12 +110,11 @@ def index():
         )
         print(f"Generated {len(characters)} characters")
 
-        # Set default image path
+        # Set default image path (since image generation is disabled)
         for c in characters:
             c["image_path"] = "/static/placeholder.png"
 
-<<<<<<< HEAD
-        # Image generation
+        # generate images
         for c in characters:
             img_file_path = generate_character_image(c)
             if img_file_path:
@@ -127,8 +123,6 @@ def index():
             else:
                 c["image_path"] = "/static/generation_failed.png"
 
-=======
->>>>>>> 3f0a4a2 ( Update app.py with evaluation metrics and UI wiring)
         # Generate last day
         print("Generating victim's last day...")
         last_day_data = generate_last_day(case_data=case_data, characters=characters)
@@ -149,20 +143,6 @@ def index():
         )
 
         print("Mystery generation complete!")
-
-        # NEW: Run evaluation metrics
-        print("\n Running quality evaluation...")
-        evaluator = SimpleEvaluator()
-        eval_results = evaluator.evaluate_mystery(
-            menu=menu,
-            case_data=case_data,
-            characters=characters,
-            last_day_data=last_day_data,
-            clues=clues,
-            solution=solution,
-        )
-        evaluator.save_report(eval_results)
-        print(f" Evaluation complete: Overall score {eval_results['overall_score']}/10")
 
         # Convert Recipe objects to dictionaries for session storage
         menu_dict = {}
@@ -187,7 +167,6 @@ def index():
             "last_day_data": last_day_data,
             "clues": clues,
             "solution": solution,
-            "evaluation": eval_results,  # Store evaluation too
         }
 
         # Debug: Confirm session storage
@@ -203,7 +182,6 @@ def index():
             last_day=last_day_data,
             clues=clues,
             solution=solution,
-            evaluation=eval_results,  # Pass evaluation to template
         )
 
     return render_template("index.html")
@@ -280,7 +258,7 @@ def export_pdf():
         )
 
     except Exception as e:
-        print(f"Error generating PDFs: {str(e)}")
+        print(f" Error generating PDFs: {str(e)}")
         import traceback
 
         traceback.print_exc()
@@ -288,4 +266,5 @@ def export_pdf():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("FLASK_PORT", os.environ.get("PORT", 5000)))
+    app.run(host="0.0.0.0", port=port, debug=True)
