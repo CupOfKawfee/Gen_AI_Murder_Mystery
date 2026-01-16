@@ -6,7 +6,6 @@ from llm_pipeline.character_generator import generate_characters
 from llm_pipeline.last_day_victim import generate_last_day
 from llm_pipeline.clue_generator import generate_clues
 from llm_pipeline.solution_generator import generate_solution
-from rag.retriever import RagRetriever
 from rag.recipes_retriever import (
     load_all_recipes,
     get_menu_for_location,
@@ -17,6 +16,8 @@ import secrets
 import os
 import zipfile
 from datetime import datetime
+from rag.retriever import RagRetriever
+
 
 
 

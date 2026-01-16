@@ -6,6 +6,8 @@ from llm_pipeline.clue_generator import generate_clues
 from llm_pipeline.solution_generator import generate_solution
 from llm_pipeline.pdf_generator import generate_all_pdfs
 from evaluation import SimpleEvaluator
+from rag.retriever import RagRetriever
+
 
 # from image_tool.image_generator import generate_character_image
 from rag.recipes_retriever import (
@@ -82,7 +84,10 @@ def main():
     if not user_prompt:
         user_prompt = "A small coastal town with a controversial political scandal"
 
-    # 2. Generate the case (victim + theme), now also using location + menu
+    # 2. Initialize RAG retriever (stub for now)
+    retriever = RagRetriever(index_path="data/index")  # adapt later
+
+    # 3. Generate the case (victim + theme), now also using location + menu
     case_data = generate_case(
         user_prompt=user_prompt,
         location=location,
@@ -95,13 +100,14 @@ def main():
     print("\n=== CASE ===")
     print(case_data)
 
-    # 3. Generate characters (with RAG context)
+    # 4. Generate characters (with RAG context)
     characters = generate_characters(
         case_data=case_data,
-        num_characters=NUM_CHARACTERS
+        num_characters=NUM_CHARACTERS,
+        retriever=retriever,
     )
 
-    # # 4. Generate Images (first image loop)
+    # # 5. Generate Images (first image loop)
     # print("\n=== GENERATING IMAGES ===")
     # for c in characters:
     #     # We pass the whole character dict so the LLM can use background/occupation
@@ -120,7 +126,7 @@ def main():
         # print(f"  Image Path: {c['image_path']}")
         print()
 
-    # 5. Reconstruct the victim's last day
+    # 6. Reconstruct the victim's last day
     last_day_data = generate_last_day(case_data=case_data, characters=characters)
     print("\n=== VICTIM'S LAST DAY ===")
     print("Overview:", last_day_data.get("overview", ""))
@@ -130,7 +136,7 @@ def main():
         print(f"  Participants: {', '.join(event['participants'])}")
         print(f"  Suspicious: {event['suspicious']}")
 
-    # 6. Generate clues
+    # 7. Generate clues
     clues = generate_clues(
         case_data=case_data,
         characters=characters,
@@ -142,7 +148,7 @@ def main():
         for c in entry["clues"]:
             print(f"  -> About {c['target']}: {c['clue']}")
 
-    # 7. Generate solution
+    # 8. Generate solution
     solution = generate_solution(
         case_data=case_data,
         characters=characters,
@@ -177,7 +183,7 @@ def main():
     print("\n=== FINAL REVEAL MONOLOGUE ===")
     print(solution.get("final_reveal_monologue", ""))
 
-    # 8. Run evaluation metrics
+    # 9. Run evaluation metrics
     print("\n" + "=" * 70)
     print("🎯 RUNNING QUALITY EVALUATION")
     print("=" * 70)
