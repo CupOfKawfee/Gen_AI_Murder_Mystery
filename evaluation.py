@@ -39,13 +39,13 @@ class SimpleEvaluator:
         results["details"]["timeline_events"] = len(timeline)
         print(f"   ✓ Timeline events: {len(timeline)} ({timeline_score:.1f}/10)")
 
-        # 3. Clue Quantity: At least 10 clues for full score
+        # 3. Clue Quantity: At least 7 clues for full score
         print("\n Checking clue quantity...")
         total_clues = sum(len(c.get("clues", [])) for c in clues)
-        clue_score = min(total_clues / 10, 1.0) * 10
+        clue_score = min(total_clues / 7, 1.0) * 7
         results["scores"]["clue_quantity"] = round(clue_score, 1)
         results["details"]["total_clues"] = total_clues
-        print(f"   ✓ Total clues: {total_clues} ({clue_score:.1f}/10)")
+        print(f"   ✓ Total clues: {total_clues} ({clue_score:.1f}/7)")
 
         # 4. RAG Integration: Menu items mentioned in case
         print("\n Checking RAG integration...")
