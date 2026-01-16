@@ -17,11 +17,8 @@ import os
 import zipfile
 from datetime import datetime
 from rag.retriever import RagRetriever
+from image_tool.image_generator import generate_character_image
 
-
-
-
-# from image_tool.image_generator import generate_character_image  # Commented out
 
 NUM_CHARACTERS = 7
 
@@ -111,16 +108,14 @@ def index():
         for c in characters:
             c["image_path"] = "/static/placeholder.png"
 
-        # Uncomment below if you want to enable image generation later
-        # import os
-        # from image_tool.image_generator import generate_character_image
-        # for c in characters:
-        #     img_file_path = generate_character_image(c)
-        #     if img_file_path:
-        #         filename = img_file_path.split(os.sep)[-1]
-        #         c["image_path"] = f"/character_images/{filename}"
-        #     else:
-        #         c["image_path"] = "/static/generation_failed.png"
+        # Image generation
+        for c in characters:
+            img_file_path = generate_character_image(c)
+            if img_file_path:
+                filename = img_file_path.split(os.sep)[-1]
+                c["image_path"] = f"/character_images/{filename}"
+            else:
+                c["image_path"] = "/static/generation_failed.png"
 
         # Generate last day
         print("Generating victim's last day...")

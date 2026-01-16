@@ -1,4 +1,5 @@
 # main.py
+from image_tool.image_generator import generate_character_image
 from llm_pipeline.case_generator import generate_case
 from llm_pipeline.character_generator import generate_characters
 from llm_pipeline.last_day_victim import generate_last_day
@@ -9,7 +10,6 @@ from evaluation import SimpleEvaluator
 from rag.retriever import RagRetriever
 
 
-# from image_tool.image_generator import generate_character_image
 from rag.recipes_retriever import (
     load_all_recipes,
     get_menu_for_location,
@@ -107,15 +107,15 @@ def main():
         retriever=retriever,
     )
 
-    # # 5. Generate Images (first image loop)
-    # print("\n=== GENERATING IMAGES ===")
-    # for c in characters:
-    #     # We pass the whole character dict so the LLM can use background/occupation
-    #     img_path = generate_character_image(c)
-    #     if img_path:
-    #         c["image_path"] = img_path
-    #     else:
-    #         c["image_path"] = "generation_failed.png"
+    # 5. Generate Images (first image loop)
+    print("\n=== GENERATING IMAGES ===")
+    for c in characters:
+        # We pass the whole character dict so the LLM can use background/occupation
+        img_path = generate_character_image(c)
+        if img_path:
+            c["image_path"] = img_path
+        else:
+            c["image_path"] = "generation_failed.png"
 
     print("\n=== CHARACTERS ===")
     for c in characters:
